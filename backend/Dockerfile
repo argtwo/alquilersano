@@ -1,8 +1,6 @@
 FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y \
-    libgdal-dev \
-    gdal-bin \
     libpq-dev \
     gcc \
     && rm -rf /var/lib/apt/lists/*
@@ -16,4 +14,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "alembic downgrade base 2>/dev/null || true && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

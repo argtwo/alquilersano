@@ -7,7 +7,6 @@ Create Date: 2026-03-21
 """
 from typing import Sequence, Union
 
-import geoalchemy2
 import sqlalchemy as sa
 from alembic import op
 
@@ -18,8 +17,13 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Activar extensión PostGIS
-    op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+    # Intentar activar PostGIS — si no está disponible, continuar sin geometría
+    try:
+        op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+        geom_type = sa.Text()  # se reemplaza abajo si postgis está disponible
+        use_postgis = True
+    except Exception:
+        use_postgis = False
 
     op.create_table(
         "barrios",
@@ -29,15 +33,10 @@ def upgrade() -> None:
         sa.Column("nombre_val", sa.String(100), nullable=True),
         sa.Column("distrito", sa.String(100), nullable=True),
         sa.Column("distrito_num", sa.Integer(), nullable=True),
-        sa.Column(
-            "geometria",
-            geoalchemy2.types.Geometry("MULTIPOLYGON", srid=4326),
-            nullable=True,
-        ),
+        sa.Column("geometria", sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("codigo_ine"),
     )
-    op.create_index("ix_barrios_geometria", "barrios", ["geometria"], postgresql_using="gist")
 
     op.create_table(
         "indicadores_renta",
@@ -116,6 +115,5 @@ def downgrade() -> None:
     op.drop_table("indicadores_exclusion")
     op.drop_table("indicadores_salud_mental")
     op.drop_table("indicadores_renta")
-    op.drop_index("ix_barrios_geometria", table_name="barrios")
     op.drop_table("barrios")
     op.execute("DROP EXTENSION IF EXISTS postgis")

@@ -7,7 +7,6 @@ python-multipart==0.0.20
 sqlalchemy[asyncio]==2.0.36
 asyncpg==0.30.0
 alembic==1.14.0
-geoalchemy2==0.17.0
 
 # ETL / Data
 pandas==2.2.3

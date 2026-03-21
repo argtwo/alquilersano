@@ -1,5 +1,4 @@
-from geoalchemy2 import Geometry
-from sqlalchemy import Float, Integer, String, UniqueConstraint
+from sqlalchemy import Float, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -9,16 +8,14 @@ class Barrio(Base):
     __tablename__ = "barrios"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    # Código INE de sección censal (ej. "4625001001")
     codigo_ine: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
     nombre: Mapped[str] = mapped_column(String(100), nullable=False)
-    nombre_val: Mapped[str | None] = mapped_column(String(100))  # Nombre en valenciano
+    nombre_val: Mapped[str | None] = mapped_column(String(100))
     distrito: Mapped[str | None] = mapped_column(String(100))
     distrito_num: Mapped[int | None] = mapped_column(Integer)
-    # Ciudad: "valencia" | "madrid" | "barcelona"
     ciudad: Mapped[str] = mapped_column(String(50), nullable=False, server_default="valencia")
-    # Polígono del barrio en EPSG:4326
-    geometria: Mapped[object | None] = mapped_column(Geometry("MULTIPOLYGON", srid=4326))
+    # GeoJSON como texto plano (sin PostGIS)
+    geometria: Mapped[str | None] = mapped_column(Text)
 
 
 class IndicadorRenta(Base):
