@@ -1,0 +1,49 @@
+{
+    "metrics": {
+        "Valencia": 269,
+        "Barcelona": 553,
+        "Madrid": 675,
+        "Castilla_y_Leon": 794,
+        "Espana": 87250
+    },
+    "top_themes": {
+        "Valencia": {
+            "Urbanismo e Infraestructuras": 86,
+            "Medio ambiente": 55,
+            "Sociedad y Bienestar": 45,
+            "Transporte": 31,
+            "Hacienda": 25,
+            "Sector Público": 20,
+            "Turismo": 12,
+            "Salud": 8,
+            "Cultura y ocio": 7,
+            "Economía": 5
+        },
+        "Barcelona": {
+            "Any 2019": 196,
+            "Any 2022": 196,
+            "Any 2023": 196,
+            "Any 2021": 190,
+            "Any 2020": 188,
+            "Any 2018": 182,
+            "Any 2024": 179,
+            "Any 2017": 169,
+            "Any 2015": 144,
+            "Any 2016": 143
+        },
+        "Madrid": {
+            "sector-publico": 110,
+            "sociedad-bienestar": 109,
+            "transporte": 108,
+            "medio-ambiente": 77,
+            "urbanismo-infraestructuras": 77,
+            "deporte": 33,
+            "cultura-ocio": 32,
+            "salud": 24,
+            "seguridad": 16,
+            "comercio": 14
+        }
+    },
+    "formats_distribution": {},
+    "datasets_sample": []
+}

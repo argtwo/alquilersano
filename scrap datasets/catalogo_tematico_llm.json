@@ -1,0 +1,616 @@
+{
+  "Valencia": {
+    "Urbanismo e Infraestructuras": {
+      "vol": 86,
+      "fmt": [],
+      "ej": [
+        "Agrupació 64 / Agrupación 64",
+        "Agrupació Estándard / Agrupación Estándard",
+        "Full 1000 / Hoja 1000",
+        "Agrupació 75 / Agrupación 75"
+      ]
+    },
+    "Medio ambiente": {
+      "vol": 55,
+      "fmt": [],
+      "ej": [
+        "OE7 Consumo de energía eléctrica doméstica",
+        "Localització contenidors piles / Localización contenedore...",
+        "Datos diarios del sensor de ruido ubicado en el barrio de...",
+        "Pipicans - Zona Socialització Canina / Pipicanes - Zona S..."
+      ]
+    },
+    "Sociedad y Bienestar": {
+      "vol": 45,
+      "fmt": [],
+      "ej": [
+        "Discapacitat Intel·lectual / Discapacidad Intelectual",
+        "Migrants / Migrantes",
+        "Rellotges amb termòmetre / Relojes con termómetro",
+        "Innovació Social / Innovacion Social"
+      ]
+    },
+    "Transporte": {
+      "vol": 31,
+      "fmt": [],
+      "ej": [
+        "Pilons extraïbles / Bolardos Extraibles",
+        "Recibos IVTM 2020 al 2025",
+        "Viajeros EMT 2020-2022",
+        "Recibos vados 2020 - 2025"
+      ]
+    },
+    "Hacienda": {
+      "vol": 25,
+      "fmt": [],
+      "ej": [
+        "Impuestos presupuestos 2020 - 2025",
+        "Política de gasto presupuesto 2023 - 2025",
+        "Presupuesto gastos 2023 - 2024 por capítulos",
+        "Recibos vados 2020 - 2025"
+      ]
+    },
+    "Sector Público": {
+      "vol": 20,
+      "fmt": [],
+      "ej": [
+        "Presupuesto gastos 2023 - 2024 por capítulos",
+        "Ordenances Taules i Cadires / Ordenanzas Mesas y Sillas",
+        "Política de gasto presupuesto 2023 - 2025",
+        "Recibos IAE 2020-2025"
+      ]
+    },
+    "Turismo": {
+      "vol": 12,
+      "fmt": [],
+      "ej": [
+        "Rutas Turismo Barrio",
+        "Ruta del Patrimonio Industrial del Grao",
+        "Oficinas de Turismo",
+        "Rutas Accesibles Jardín Turia"
+      ]
+    },
+    "Salud": {
+      "vol": 8,
+      "fmt": [],
+      "ej": [
+        "Zones ZAS / Zonas ZAS",
+        "Datos por horas calidad aire 2021-2022",
+        "Malaltia Mental / Enfermedad Mental",
+        "OE3 Emisiones toneladas de CO2 por cada 100 habitantes"
+      ]
+    },
+    "Cultura y ocio": {
+      "vol": 7,
+      "fmt": [],
+      "ej": [
+        "Eventos navideños",
+        "Ruta Cabalgata de Reyes 2023",
+        "Carpes falles / Carpas fallas",
+        "Recibos mesas y sillas 2020 - 2025"
+      ]
+    },
+    "Economía": {
+      "vol": 5,
+      "fmt": [],
+      "ej": [
+        "Renta por persona y hogar",
+        "Estado liquidación de gastos",
+        "Resumen del inventario general de bienes y derechos de la...",
+        "PIB de la provincia de Valencia"
+      ]
+    },
+    "Seguridad": {
+      "vol": 3,
+      "fmt": [],
+      "ej": [
+        "Hidrants per als bombers / Hidrantes para los bomberos",
+        "Districtes Policials / Distritos Policiales",
+        "Barris Policials / Barrios Policiales"
+      ]
+    },
+    "Otros": {
+      "vol": 2,
+      "fmt": [],
+      "ej": [
+        "Zona de Bajas Emisiones",
+        "Urinaris / Urinarios"
+      ]
+    },
+    "Educación": {
+      "vol": 1,
+      "fmt": [],
+      "ej": [
+        "Zones Jocs Infantils / Zona Juegos Infantiles"
+      ]
+    },
+    "Ciencia y tecnología": {
+      "vol": 1,
+      "fmt": [],
+      "ej": [
+        "Catàleg de Dades Obertes / Catálogo de Datos Abiertos"
+      ]
+    }
+  },
+  "Barcelona": {
+    "\"N\"": {
+      "vol": 36534,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-perso",
+        "20170706-distri",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "20170706-districtes-barris,\"Unitats administratives  de l...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"S\"": {
+      "vol": 4810,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-perso",
+        "20170706-distri",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "20170706-districtes-barris,\"Unitats administratives  de l...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"No\"": {
+      "vol": 1588,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-perso",
+        "20170706-distri",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "20170706-districtes-barris,\"Unitats administratives  de l...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"Yes\"": {
+      "vol": 933,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-perso",
+        "20170706-distri",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "20170706-districtes-barris,\"Unitats administratives  de l...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"N/A\"": {
+      "vol": 875,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-perso",
+        "20170706-distri",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "20170706-districtes-barris,\"Unitats administratives  de l...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"\"": {
+      "vol": 565,
+      "fmt": [
+        "administracio-m",
+        "afectacions-tur",
+        "administracio-e",
+        "administracio-a",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "administracio-estatal,\"Equipaments de l'Administració est...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "administracio-autonomica,\"Equipaments de l'Administració ...",
+        "administracio-municipal,\"Equipaments de l'Administració m..."
+      ]
+    },
+    "\"3\"": {
+      "vol": 559,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-perso",
+        "20170706-distri",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "20170706-districtes-barris,\"Unitats administratives  de l...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"Creative Commons Attribution 4.0\"": {
+      "vol": 544,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-perso",
+        "20170706-distri",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "20170706-districtes-barris,\"Unitats administratives  de l...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"ODS 11: Ciutats i comunitats sostenibles\"": {
+      "vol": 271,
+      "fmt": [
+        "afectacions-tur",
+        "aforament-tipus",
+        "aforaments-desc",
+        "20170706-distri",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "afectacions-turistiques,\"Afectacions per intensitat d’act...",
+        "afectacions-turistiques-a-espais-verds,\"Afectacions per i...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "20170706-districtes-barris,\"Unitats administratives  de l..."
+      ]
+    },
+    "\"Ajuntament de Barcelona\"": {
+      "vol": 218,
+      "fmt": [
+        "accidents-cause",
+        "accidents-tipus",
+        "accidents-vehic",
+        "accidents-perso",
+        "20170706-distri"
+      ],
+      "ej": [
+        "accidents-tipus-gu-bcn,\"Accidents segons tipologia  gesti...",
+        "accidents-persones-gu-bcn,\"Persones involucrades en accid...",
+        "20170706-districtes-barris,\"Unitats administratives  de l...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"Ciutat i serveis\"": {
+      "vol": 212,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-tipus",
+        "accidents-vehic",
+        "accidents-perso"
+      ],
+      "ej": [
+        "accidents-tipus-gu-bcn,\"Accidents segons tipologia  gesti...",
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accidents-persones-gu-bcn,\"Persones involucrades en accid...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "\"2\"": {
+      "vol": 191,
+      "fmt": [
+        "administracio-m",
+        "afectacions-tur",
+        "agenda-activita",
+        "administracio-e",
+        "administracio-a"
+      ],
+      "ej": [
+        "afectacions-turistiques-a-espais-verds,\"Afectacions per i...",
+        "administracio-estatal,\"Equipaments de l'Administració est...",
+        "administracio-autonomica,\"Equipaments de l'Administració ...",
+        "administracio-municipal,\"Equipaments de l'Administració m..."
+      ]
+    },
+    "Any 2021": {
+      "vol": 185,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-tipus",
+        "accidents-perso",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "accidents-persones-gu-bcn,\"Persones involucrades en accid...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "Any 2022": {
+      "vol": 183,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-tipus",
+        "accidents-perso",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "accidents-persones-gu-bcn,\"Persones involucrades en accid...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    },
+    "Any 2019": {
+      "vol": 182,
+      "fmt": [
+        "accidents-gu-bc",
+        "accidents-cause",
+        "accidents-tipus",
+        "accidents-perso",
+        "accessibilitat-"
+      ],
+      "ej": [
+        "accidents-gu-bcn,\"Accidents gestionats per la Guàrdia Urb...",
+        "accessibilitat-via-publica,\"Accessibilitat a la via públi...",
+        "accidents-persones-gu-bcn,\"Persones involucrades en accid...",
+        "accidents-causes-gu-bcn,\"Accidents segons causa mediata g..."
+      ]
+    }
+  },
+  "Madrid": {
+    "sector-publico": {
+      "vol": 110,
+      "fmt": [
+        "csv,xlsx",
+        "csv",
+        "csv,json,pdf,xm",
+        "pdf,xlsx",
+        "csv,pdf,xlsx"
+      ],
+      "ej": [
+        "Encuesta de satisfacción con el servicio de acceso a la i...",
+        "Relación de unidades orgánicas con sus códigos DIR3 para ...",
+        "Comentarios publicados en el Portal de Datos Abiertos",
+        "Periodo medio de pago a proveedores"
+      ]
+    },
+    "sociedad-bienestar": {
+      "vol": 109,
+      "fmt": [
+        "csv,xlsx",
+        "xlsx",
+        "csv,json,pdf,xl",
+        "csv,json,pdf,xm",
+        "pdf,xlsx"
+      ],
+      "ej": [
+        "La violencia sexual en la ciudad de Madrid",
+        "Entidades de participación ciudadana. Fundaciones (Secció...",
+        "Estudio de satisfacción de personas usuarias de los Punto...",
+        "Estudio de satisfacción con el Programa de Atención a la ..."
+      ]
+    },
+    "transporte": {
+      "vol": 108,
+      "fmt": [
+        "xlsx",
+        "zip",
+        "json",
+        "csv,pdf,zip",
+        "csv,json,kml,xl"
+      ],
+      "ej": [
+        "Bici. Infraestructura ciclista",
+        "Puntos de recarga de vehículos eléctricos instalados en e...",
+        "BiciMAD. Datos de la situación de estaciones bicimad por ...",
+        "Bici. Aparcabicis"
+      ]
+    },
+    "medio-ambiente": {
+      "vol": 77,
+      "fmt": [
+        "zip",
+        "csv,json,pdf,xl",
+        "csv",
+        "pdf,xlsx",
+        "csv,pdf,xlsx"
+      ],
+      "ej": [
+        "Mobiliario urbano. Bancos",
+        "Mobiliario urbano. Juegos en áreas infantiles",
+        "Puntos limpios móviles 24 horas",
+        "Flora Urbana de Madrid"
+      ]
+    },
+    "urbanismo-infraestructuras": {
+      "vol": 77,
+      "fmt": [
+        "wms",
+        "shp",
+        "zip",
+        "kmz,zip",
+        "csv,kmz,pdf,xls"
+      ],
+      "ej": [
+        "Callejero oficial. Geometrías de rotulación de callejero ...",
+        "Colegios Electorales",
+        "Catálogo de Edificios Protegidos",
+        "Operación Asfalto. Madrid 2021"
+      ]
+    },
+    "deporte": {
+      "vol": 33,
+      "fmt": [
+        "csv,xlsx",
+        "xlsx",
+        "zip",
+        "pdf,xlsx",
+        "csv,pdf,xlsx"
+      ],
+      "ej": [
+        "Estudio de Satisfacción de las personas usuarias de las p...",
+        "Deportes. Listas de espera de las clases de actividad dir...",
+        "Calendario de carreras urbanas. Temporada vigente",
+        "Deportes. Clases y actividades dirigidas para toda la tem..."
+      ]
+    },
+    "cultura-ocio": {
+      "vol": 32,
+      "fmt": [
+        "csv,xlsx",
+        "csv,pdf,xlsx,xm",
+        "csv,json,pdf,xm",
+        "csv,json,xlsx,x",
+        "csv,pdf,xlsx"
+      ],
+      "ej": [
+        "memoria de Madrid. Tarjetas postales",
+        "memoria de Madrid. Reglamentos Históricos del Ayuntamient...",
+        "Áreas de actividades deportivas",
+        "Cursos y talleres en los centros culturales de los distritos"
+      ]
+    },
+    "salud": {
+      "vol": 24,
+      "fmt": [
+        "csv,xlsx",
+        "xlsx",
+        "pdf,xls,xlsx,zi",
+        "pdf,xls,zip",
+        "csv,pdf,xlsx"
+      ],
+      "ej": [
+        "Madrid Salud. Estadísticas centro de protección animal",
+        "Madrid Salud. Personas en tratamiento en los centros de a...",
+        "Encuesta de satisfacción realizada entre las personas que...",
+        "Madrid Salud. Estadísticas de inspecciones realizadas cen..."
+      ]
+    },
+    "seguridad": {
+      "vol": 16,
+      "fmt": [
+        "csv,xlsx",
+        "csv,pdf,xls",
+        "csv,json,pdf,xl",
+        "csv,geo,json,pd",
+        "csv,pdf,xlsx"
+      ],
+      "ej": [
+        "Vehículos SAMUR Protección Civil",
+        "Comisarías",
+        "Planes de formación del Centro Integral de Formación de S...",
+        "Informe de satisfacción de las personas usuarias de los s..."
+      ]
+    },
+    "comercio": {
+      "vol": 14,
+      "fmt": [
+        "csv,pdf,xls",
+        "csv,geo,pdf,xls",
+        "pdf,xls",
+        "csv,pdf,txt",
+        "csv,pdf,xlsx"
+      ],
+      "ej": [
+        "Mercados municipales: locales comerciales, nombres comerc...",
+        "Relación de situados aislados en vía pública",
+        "COVID-19. Mercamadrid: volumen y precio de productos come...",
+        "Empresas adheridas a los códigos de buenas prácticas"
+      ]
+    },
+    "turismo": {
+      "vol": 13,
+      "fmt": [
+        "pdf,xml",
+        "csv,xlsx",
+        "pdf,zip",
+        "csv,geo,json,pd"
+      ],
+      "ej": [
+        "Alumbrado navideño",
+        "Estudio de satisfacción de personas usuarias del Servicio...",
+        "Estudio de satisfacción de los Servicios de Atención al V...",
+        "Puntos de interés turístico de la ciudad de Madrid. Qué v..."
+      ]
+    },
+    "hacienda": {
+      "vol": 12,
+      "fmt": [
+        "csv,xlsx",
+        "pdf,zip",
+        "pdf,xlsx",
+        "csv,pdf,xlsx",
+        "csv,pdf,xls,xls"
+      ],
+      "ej": [
+        "Impuesto sobre el Incremento de Valor de los Terrenos de ...",
+        "Tablas para el cálculo de la cuota de la tasa de gestión ...",
+        "Estudio de satisfacción de las personas usuarias de la Ag...",
+        "Categorías fiscales del municipio de Madrid"
+      ]
+    },
+    "educacion": {
+      "vol": 12,
+      "fmt": [
+        "csv,pdf,xlsx",
+        "csv,geo,json,pd"
+      ],
+      "ej": [
+        "Colegios Públicos de Madrid: estudios sobre los patios es...",
+        "Escuelas infantiles municipales: empresas gestoras",
+        "Centros educativos en Madrid",
+        "Alumnado universitario en prácticas en el Ayuntamiento de..."
+      ]
+    },
+    "empleo": {
+      "vol": 9,
+      "fmt": [
+        "csv,xlsx",
+        "csv,json,pdf,xl",
+        "csv,geo,json,pd",
+        "csv,pdf,xlsx",
+        "rss"
+      ],
+      "ej": [
+        "Estudio de satisfacción de las personas usuarias de los s...",
+        "Ejecución del plan de formación del Ayuntamiento de Madrid",
+        "Ofertas de Empleo Público del Ayuntamiento de Madrid y su...",
+        "Mentoring"
+      ]
+    },
+    "economia": {
+      "vol": 9,
+      "fmt": [
+        "csv,pdf,xlsx",
+        "csv,pdf,xls",
+        "pdf,xls",
+        "pdf,xlsx"
+      ],
+      "ej": [
+        "Piscinas de comunidades de vecinos",
+        "Agenda de Innovación",
+        "Encargos a medios propios personificados",
+        "Agenda de Innovación (2018-enero hasta 2022-octubre)"
+      ]
+    }
+  },
+  "Espana": {},
+  "Castilla_y_Leon": {}
+}

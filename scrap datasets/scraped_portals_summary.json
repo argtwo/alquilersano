@@ -1,0 +1,45 @@
+{
+    "Catalunya": {
+        "url": "https://analisi.transparenciacatalunya.cat/?sortBy=relevance&page=1&pageSize=20",
+        "total_datasets": "N/A",
+        "themes_or_highlights": [
+            "Menú"
+        ]
+    },
+    "Comunidad Valenciana": {
+        "url": "https://dadesobertes.gva.es/dataset?q=&sort=views_recent+desc",
+        "total_datasets": "N/A",
+        "themes_or_highlights": [
+            "Sistema Valenciano de Salud. Mapa sanitario: Zonas básicas de salud",
+            "Directorio de Asociaciones de la Comunitat Valenciana",
+            "Listado de estaciones de la ITV en la Comunitat Valenciana",
+            "Datos de turismo sobre viviendas de uso turístico en la Comunitat Valenciana",
+            "Itinerarios y horarios de los servicios de transporte público interurbano en autobús"
+        ]
+    },
+    "Alicante": {
+        "url": "https://datosabiertos.alicante.es/?q=search/type/dataset",
+        "total_datasets": "N/A",
+        "themes_or_highlights": []
+    },
+    "Region de Murcia": {
+        "url": "https://datosabiertos.regiondemurcia.es/catalogo.html",
+        "total_datasets": "N/A",
+        "themes_or_highlights": []
+    },
+    "Datos de Espana": {
+        "url": "https://datos.gob.es/es/catalogo/conjuntos-datos",
+        "total_datasets": "87250",
+        "themes_or_highlights": [
+            "Sector publico",
+            "Economia",
+            "Sociedad",
+            "Medio ambiente"
+        ]
+    },
+    "Andalucia": {
+        "url": "https://www.juntadeandalucia.es/datosabiertos/portal/dataset",
+        "total_datasets": "N/A",
+        "themes_or_highlights": []
+    }
+}

@@ -50,3 +50,6 @@ htmlcov/
 # Build frontend
 frontend/dist/
 frontend/.vite/
+
+# Claude Desktop Commander settings
+.claude/
