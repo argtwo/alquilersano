@@ -14,7 +14,7 @@ services:
     dockerContext: ./backend
     plan: starter          # cambiar a "standard" en producción real
     region: frankfurt      # más cercano a España
-    branch: main
+    branch: master
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
@@ -22,7 +22,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_ORIGINS
-        value: "https://alquilersano.vercel.app,https://alquilersano.es"
+        value: "https://alquilersano.vercel.app,https://alquilersano.es,https://frontend-6uiwrc40q-fabrizionbs-projects.vercel.app,https://frontend-fabrizionbs-projects.vercel.app,https://frontend-gamma-khaki-78.vercel.app"
       - key: DEBUG
         value: "false"
 
