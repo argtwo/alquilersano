@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo -->
+  <rect width="512" height="512" rx="80" fill="#2563eb"/>
+  <!-- Casa (símbolo vivienda) -->
+  <path d="M256 100 L420 230 L420 420 L300 420 L300 320 L212 320 L212 420 L92 420 L92 230 Z"
+        fill="none" stroke="white" stroke-width="24" stroke-linejoin="round"/>
+  <!-- Barra de estrés (termómetro) -->
+  <rect x="228" y="250" width="56" height="10" rx="5" fill="#fbbf24"/>
+  <rect x="228" y="270" width="40" height="10" rx="5" fill="#f97316"/>
+  <rect x="228" y="290" width="56" height="10" rx="5" fill="#ef4444"/>
+</svg>

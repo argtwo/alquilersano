@@ -1,0 +1,79 @@
+version: "3.9"
+
+# ── Producción ─────────────────────────────────────────────────────────────────
+# Uso: docker compose -f docker-compose.prod.yml up -d
+#
+# Diferencias respecto al compose de dev:
+#   - Sin bind mounts (imágenes autocontenidas)
+#   - Backend sin --reload, con 2 workers
+#   - Frontend servido por nginx (puerto 80) en lugar de Vite dev server
+#   - Migraciones de BD ejecutadas automáticamente al arrancar
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: alquilersano_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-alquiler}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Variable POSTGRES_PASSWORD requerida}
+      POSTGRES_DB: ${POSTGRES_DB:-alquilersano}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-alquiler}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: alquilersano_migrate
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["alembic", "upgrade", "head"]
+    # Ejecuta una sola vez y sale — el backend espera a que termine
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: alquilersano_backend
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Vacío = rutas relativas; nginx proxy reenvía /api/ al backend interno
+        VITE_API_URL: ""
+    container_name: alquilersano_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:
