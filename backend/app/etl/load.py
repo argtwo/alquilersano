@@ -50,18 +50,13 @@ def load_barrios(engine, ciudad: str = "valencia") -> dict[str, int]:
     with engine.begin() as conn:
         for feat in gj["features"]:
             props = feat["properties"]
-            geom_wkt = None
-            if feat.get("geometry"):
-                geom_str = json.dumps(feat["geometry"])
-                geom_wkt = f"ST_SetSRID(ST_GeomFromGeoJSON('{geom_str}'), 4326)"
+            # Guardar geometría como GeoJSON texto (sin PostGIS)
+            geom_text = json.dumps(feat["geometry"]) if feat.get("geometry") else None
 
             result = conn.execute(
                 text("""
                     INSERT INTO barrios (codigo_ine, nombre, nombre_val, distrito, distrito_num, ciudad, geometria)
-                    VALUES (
-                        :codigo_ine, :nombre, :nombre_val, :distrito, :distrito_num, :ciudad,
-                        """ + (geom_wkt or "NULL") + """
-                    )
+                    VALUES (:codigo_ine, :nombre, :nombre_val, :distrito, :distrito_num, :ciudad, :geometria)
                     ON CONFLICT (codigo_ine) DO UPDATE SET
                         nombre = EXCLUDED.nombre,
                         nombre_val = EXCLUDED.nombre_val,
@@ -77,6 +72,7 @@ def load_barrios(engine, ciudad: str = "valencia") -> dict[str, int]:
                     "distrito": props.get("distrito"),
                     "distrito_num": props.get("distrito_num"),
                     "ciudad": ciudad,
+                    "geometria": geom_text,
                 },
             )
             barrio_id = result.scalar()
