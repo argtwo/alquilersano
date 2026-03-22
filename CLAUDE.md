@@ -73,6 +73,17 @@ Plataforma web que calcula el IER cruzando datos de gran tenedor (IBI), vulnerab
 - [ ] Cargar Barcelona
 - [ ] Desactivar opciones sin datos en selector ciudad
 
+### Fase 5: Escalar a toda la Comunidad Valenciana ⏳ (ver README.md para detalle)
+
+Datasets nacionales confirmados que cubren TODOS los municipios:
+- **ADRH** (INE): renta por municipio y sección censal (serie 2015-2023)
+- **Catastro titulares**: persona física/jurídica por municipio
+- **IBI estadísticas**: recaudación por municipio
+- **IRPF por municipio** (AEAT): renta bruta/disponible
+- **GeoJSON municipios CV**: 542 municipios (dadesobertes.gva.es)
+
+Pasos: descargar datasets → schema multi-nivel (municipio+barrio) → ETL → frontend zoom
+
 ### Mejoras técnicas (cuando haya hueco)
 
 - [ ] Eliminar `startup.py` drop de alembic_version
