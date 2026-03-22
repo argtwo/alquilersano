@@ -10,7 +10,7 @@ import { useStats } from './hooks/useStats'
 import type { BarrioConIER, FiltrosMapaState } from './types'
 
 const DEFAULT_FILTROS: FiltrosMapaState = {
-  anyo: 2024,
+  anyo: 2025,
   minIER: 0,
   maxIER: 100,
   riesgoDesahucio: 'TODOS',
