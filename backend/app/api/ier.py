@@ -21,7 +21,7 @@ router = APIRouter(prefix="/ier", tags=["ier"])
 @router.get("", response_model=list[BarrioGeoSchema])
 async def get_ier_mapa(
     request: Request,
-    year: int = Query(default=2025, ge=2021, le=2025),
+    year: int = Query(default=2025, ge=2015, le=2025),
     min_ier: float = Query(default=0, ge=0, le=100),
     max_ier: float = Query(default=100, ge=0, le=100),
     distrito: str | None = None,
@@ -78,7 +78,7 @@ async def get_historico(
 
 @router.post("/recalculate", response_model=RecalculateResponse)
 async def recalculate(
-    year: int = Query(default=2025, ge=2021, le=2025),
+    year: int = Query(default=2025, ge=2015, le=2025),
     db: AsyncSession = Depends(get_db),
     _admin: dict = Depends(require_admin),
 ):

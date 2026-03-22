@@ -14,7 +14,7 @@ router = APIRouter(prefix="/alertas", tags=["alertas"])
 
 @router.get("", response_model=list[BarrioConIERSchema])
 async def list_alertas(
-    year: int = Query(default=2025, ge=2021, le=2025),
+    year: int = Query(default=2025, ge=2015, le=2025),
     nivel: list[str] = Query(default=["ALTO", "CRÍTICO"]),
     db: AsyncSession = Depends(get_db),
 ):

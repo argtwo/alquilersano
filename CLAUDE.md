@@ -75,14 +75,17 @@ Plataforma web que calcula el IER cruzando datos de gran tenedor (IBI), vulnerab
 
 ### Fase 5: Escalar a toda la Comunidad Valenciana ⏳ (ver README.md para detalle)
 
-Datasets nacionales confirmados que cubren TODOS los municipios:
-- **ADRH** (INE): renta por municipio y sección censal (serie 2015-2023)
-- **Catastro titulares**: persona física/jurídica por municipio
-- **IBI estadísticas**: recaudación por municipio
-- **IRPF por municipio** (AEAT): renta bruta/disponible
-- **GeoJSON municipios CV**: 542 municipios (dadesobertes.gva.es)
+**Provincia Valencia (46): ✅ COMPLETADO**
+- 264 municipios cargados con geometría GeoJSON (dadesobertes.gva.es)
+- Datos ADRH del INE: renta, pobreza, Gini (tablas 31250, 31249, 31251, 31252, 31255, 37721)
+- IER calculado: rango 26.3-64.2, Top=Camporrobles, Bottom=Aielo de Rugat
+- Frontend: selector "Provincia Valencia (municipios)" con centro/zoom ajustado
+- Scripts: `download_all_nacional.js` + `etl_municipios_cv.js`
+- ciudad='valencia_provincia' en DB para distinguir de barrios
 
-Pasos: descargar datasets → schema multi-nivel (municipio+barrio) → ETL → frontend zoom
+**Provincias Alicante (03) y Castellón (12): pendiente**
+- Necesitan sus propias tablas ADRH del INE (IDs diferentes)
+- El GeoJSON ya tiene los 542 municipios de toda la CV
 
 ### Mejoras técnicas (cuando haya hueco)
 
