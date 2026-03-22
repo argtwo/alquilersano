@@ -262,6 +262,86 @@ node etl4.js
 | Madrid | ⏳ | ⏳ | ⏳ | Pendiente |
 | Barcelona | ⏳ | ⏳ | ⏳ | Pendiente |
 
+---
+
+## 🚀 FASE 5: Escalar a toda la Comunidad Valenciana (y más allá)
+
+### El problema actual
+Los datos de Open Data **Valencia ciudad** solo cubren los 88 barrios del término municipal. Municipios como Xirivella, Picanya, Paiporta, Torrent, Mislata, etc. no aparecen porque son municipios independientes, no barrios de Valencia.
+
+### La solución: datasets nacionales/autonómicos
+
+**¡ES POSIBLE!** Existen datasets de alcance nacional que cubren TODOS los municipios de España, a nivel de municipio e incluso sección censal. La clave es combinar:
+
+#### Fuentes de datos confirmadas
+
+| Dataset | Fuente | Granularidad | Indicadores | Formato | URL |
+|---------|--------|-------------|-------------|---------|-----|
+| **ADRH** (Atlas Distribución Renta Hogares) | INE | Sección censal, distrito, municipio | Renta media, mediana, Gini, % pobreza, demografía | CSV/PC-Axis | ine.es/dynt3/inebase (serie 2015-2023) |
+| **Estadísticas catastrales: Titulares** | DG Catastro | Municipio | Titulares persona física/jurídica, nº inmuebles por tramo | PC-Axis/DBF | catastro.hacienda.gob.es/esp/estadisticas.asp |
+| **Estadísticas IBI** | DG Catastro | Municipio | Recaudación IBI, nº recibos, valor catastral | PC-Axis | catastro.hacienda.gob.es/esp/estadistica_6.asp |
+| **IRPF por municipio** | AEAT | Municipio (>1000 hab) | Renta bruta media, renta disponible, componentes | CSV | sede.agenciatributaria.gob.es |
+| **IRPF por código postal** | AEAT | Código postal (grandes municipios) | Renta bruta por distrito postal | CSV | sede.agenciatributaria.gob.es |
+| **GeoJSON municipios CV** | GVA (dadesobertes) | Municipio | Geometría de los 542 municipios de la CV | GeoJSON | dadesobertes.gva.es/dataset/sanidad-sip-municipios |
+| **Secciones censales** | INE/Catastro | Sección censal | Geometría | SHP/GeoJSON | Varias fuentes |
+
+#### Cambio de modelo: de barrio a municipio
+
+Para cubrir Xirivella, Picanya, etc., el enfoque cambia:
+
+**Nivel 1 — Municipios de la CV (542 municipios):**
+- GeoJSON de municipios ya disponible en dadesobertes.gva.es
+- ADRH del INE tiene renta por municipio para TODOS (serie 2015-2023)
+- Catastro tiene IBI y titulares por municipio
+- IRPF de la AEAT tiene renta por municipio (+1000 hab)
+- Resultado: IER a nivel municipal para toda la Comunidad Valenciana
+
+**Nivel 2 — Barrios dentro de grandes ciudades (Valencia, Alicante, Castellón):**
+- Mantener los 88 barrios de Valencia ciudad (datos actuales)
+- Buscar datos de barrios para Alicante y Castellón en sus portales open data
+- Zoom: al hacer clic en Valencia ciudad → ver barrios; al hacer clic en Xirivella → ver dato municipal
+
+**Nivel 3 (futuro) — Secciones censales:**
+- El ADRH tiene datos por sección censal (la unidad más pequeña, ~1500 personas)
+- Permitiría ver desigualdad DENTRO de cada municipio
+- Requiere GeoJSON de secciones censales (disponible en INE/Catastro)
+
+#### Plan de implementación
+
+**Paso 1: Descargar y explorar datasets nacionales**
+- [ ] Descargar ADRH del INE (CSV) filtrado para provincia de Valencia (46)
+- [ ] Descargar estadísticas catastrales titulares (persona jurídica por municipio)
+- [ ] Descargar GeoJSON municipios CV desde dadesobertes.gva.es
+- [ ] Explorar formato y campos disponibles de cada dataset
+
+**Paso 2: Diseñar schema multi-nivel**
+- [ ] Ampliar tabla `barrios` → `zonas` o añadir campo `tipo` (municipio/barrio/seccion_censal)
+- [ ] O crear tabla separada `municipios` con relación a barrios
+- [ ] Definir código INE como clave: municipio=5 dígitos, barrio=municipio+distrito+barrio
+
+**Paso 3: ETL municipios CV**
+- [ ] Cargar 542 municipios con geometría
+- [ ] Cruzar con ADRH: renta media, % pobreza, Gini
+- [ ] Cruzar con Catastro: % persona jurídica, nº inmuebles
+- [ ] Calcular IER municipal
+
+**Paso 4: Adaptar frontend multi-nivel**
+- [ ] Vista inicial: mapa de municipios de la CV
+- [ ] Zoom a Valencia ciudad: cambiar a vista de barrios (datos actuales)
+- [ ] Selector de nivel: municipio / barrio
+- [ ] Ajustar filtros y leyenda
+
+**Paso 5: Escalar a España (cuando CV esté completo)**
+- [ ] Mismos datasets nacionales, filtrar por provincia/CCAA
+- [ ] GeoJSON municipios de toda España (disponible en IGN)
+- [ ] Madrid barrios + municipios corona metropolitana
+- [ ] Barcelona barrios + municipios AMB
+
+#### Ventaja del enfoque nacional
+Una vez montado el pipeline con ADRH + Catastro + GeoJSON, escalar de la CV a toda España es simplemente cambiar el filtro de provincia. Los mismos datasets cubren los ~8.000 municipios de España.
+
+---
+
 ## Licencia
 
 MIT
