@@ -39,9 +39,9 @@ async def get_barrio(
     if not barrio:
         raise HTTPException(status_code=404, detail=f"Barrio {barrio_id} no encontrado")
 
-    # Obtener geometría como GeoJSON usando PostGIS ST_AsGeoJSON
+    # Geometría guardada como GeoJSON texto (sin PostGIS)
     geom_result = await db.execute(
-        text("SELECT ST_AsGeoJSON(geometria) AS geojson FROM barrios WHERE id = :id"),
+        text("SELECT geometria AS geojson FROM barrios WHERE id = :id"),
         {"id": barrio_id},
     )
     geom_row = geom_result.one_or_none()

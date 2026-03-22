@@ -41,12 +41,15 @@ async def get_ier_mapa(
     barrio_ids = [b.id for b, _ in pairs]
     placeholders = ", ".join(str(i) for i in barrio_ids)
     geom_result = await db.execute(
-        text(f"SELECT id, ST_AsGeoJSON(geometria) AS geojson FROM barrios WHERE id IN ({placeholders})")
+        text(f"SELECT id, geometria AS geojson FROM barrios WHERE id IN ({placeholders})")
     )
     geom_map: dict[int, dict] = {}
     for row in geom_result:
         if row.geojson:
-            geom_map[row.id] = json.loads(row.geojson)
+            try:
+                geom_map[row.id] = json.loads(row.geojson)
+            except Exception:
+                pass
 
     return [
         BarrioGeoSchema(
