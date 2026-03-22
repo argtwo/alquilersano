@@ -42,13 +42,15 @@ Plataforma web que calcula el IER cruzando datos de gran tenedor (IBI), vulnerab
 
 ## TODO — Plan de trabajo (ver README.md para detalle completo)
 
-### Fase 1: Corregir datos existentes 🔴 ← PRÓXIMO PASO
+### Fase 1: Corregir datos existentes 🔴 ✅ COMPLETADO
 
-- [ ] **1.1 — Arreglar matching 8 barrios IBI** — Añadir diccionario de aliases en `etl4.js`. Mapeos confirmados: CIUTAT ARTS I CI NCIES→CIUTAT DE LES ARTS I DE LES CIENCIES, EL CABANYAL-EL CANYAMELAR→CABANYAL-CANYAMELAR, EL CASTELLAR-L'OLIVERAL→CASTELLAR-L'OLIVERAL, FONTETA DE SANT LLUIS→LA FONTETA S.LLUIS, GRAN VIA→LA GRAN VIA, MAUELLA→MAHUELLA-TAULADELLA, MONT-OLIVET→MONTOLIVET, SANT LLOREN→SANT LLORENS
-- [ ] **1.2 — Corregir mapeo vulnerabilidad** — `ind_econom`/`ind_global` son índices 0-100, no porcentajes. Normalizar por max del dataset antes de multiplicar. También mapear MONT-OLIVET→MONTOLIVET para vulnerabilidad.
-- [ ] **1.3 — Recalcular IER** — Ejecutar `node etl4.js` tras los fixes.
+- [x] **1.1 — Arreglar matching 8 barrios IBI** — Diccionario de aliases en `etl4.js`. IBI sin match: 0 (antes 8). 87/88 barrios con datos.
+- [x] **1.2 — Corregir mapeo vulnerabilidad** — `ind_econom`/`ind_global` ahora normalizados por max del dataset (0-1). 70/88 barrios con vulnerabilidad.
+- [x] **1.3 — Recalcular IER** — Ejecutado. IER medio=40.4, rango 3.0-82.8. Distribución: BAJO 75, MEDIO 237, ALTO 118, CRÍTICO 5.
+- [x] **1.4 — Frontend año default** — Cambiado a 2025, quitado 2020 del selector.
+- [x] **1.5 — Fix .env.production** — Apuntaba a Render, corregido a Railway.
 
-### Fase 2: Enriquecer datos Valencia 🟡
+### Fase 2: Enriquecer datos Valencia 🟡 ← PRÓXIMO PASO
 
 - [ ] **2.1** — Cargar precio vivienda libre/m² (`habitatge-lliure-preu-metre-quadrat`)
 - [ ] **2.2** — Cargar demografía por manzana → agregar por barrio (`illes-amb-dades-de-poblacio`)
