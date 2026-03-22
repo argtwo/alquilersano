@@ -17,13 +17,10 @@ try:
     conn = psycopg2.connect(sync_url)
     conn.autocommit = True
     cur = conn.cursor()
-    cur.execute("""
-        DROP TABLE IF EXISTS alembic_version, ier_scores, recibos_ibi,
-        indicadores_exclusion, indicadores_salud_mental,
-        indicadores_renta, barrios CASCADE;
-    """)
+    # Solo borrar alembic_version para forzar re-migración limpia
+    cur.execute("DROP TABLE IF EXISTS alembic_version;")
     conn.close()
-    log.info("✓ Tablas eliminadas")
+    log.info("✓ alembic_version eliminada")
 except Exception as e:
     log.warning(f"Drop: {e}")
 
