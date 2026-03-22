@@ -1,29 +1,32 @@
 # AlquilerSano — Índice de Estrés Habitacional por Barrio
 
-Plataforma web que calcula el **Índice de Estrés Residencial (IER)** por barrio, cruzando el porcentaje de renta destinada al alquiler con indicadores de salud mental y exclusión social. Visualiza un mapa de calor de vulnerabilidad con granularidad de barrio en Valencia, Madrid y Barcelona.
+Plataforma web que calcula el **Índice de Estrés Residencial (IER)** por barrio, cruzando datos de gran tenedor (IBI), vulnerabilidad económica e indicadores de exclusión social. Visualiza un mapa de calor de vulnerabilidad con granularidad de barrio para Valencia, Madrid y Barcelona.
 
 > Contexto: el 20% de hogares con bajos ingresos en España destina más del 70% de su renta al alquiler (FOESSA 2025).
 
-## Demo
+## 🌐 Links en producción
 
-- **Frontend (Vercel):** _pendiente de despliegue_
-- **API (Render):** _pendiente de despliegue_
+| Servicio | URL |
+|----------|-----|
+| **Frontend (Vercel)** | https://frontend-fabrizionbs-projects.vercel.app |
+| **Backend (Railway)** | https://alquilersano-backend-production.up.railway.app |
+| **API Docs** | https://alquilersano-backend-production.up.railway.app/docs |
+| **Repositorio GitHub** | https://github.com/argtwo/alquilersano |
 
 ## Fórmula IER
 
 ```
-IER = 0.5·(Coste_Alquiler / Ingreso_Hogar) + 0.3·Precariedad_Laboral − 0.2·Acceso_Salud_Mental
+IER = compAlquiler(gran_tenedor) + compPrecariedad(vulnerabilidad_económica) + compSocial(exclusión)
 ```
 
-Rango 0–100 · mayor valor = mayor estrés habitacional · Pesos calibrados con datos FOESSA 2025.
+Rango 0–100 · mayor valor = mayor estrés habitacional.
 
 | Rango IER | Etiqueta | Color |
 |-----------|----------|-------|
-| 0–39 | Bajo | Verde |
-| 40–54 | Moderado | Amarillo |
-| 55–69 | Alto | Naranja |
-| 70–84 | Crítico | Rojo |
-| 85–100 | Extremo | Granate |
+| 0–24 | Bajo | Verde |
+| 25–49 | Moderado | Amarillo |
+| 50–74 | Alto | Naranja |
+| 75–100 | Crítico | Rojo |
 
 ## Stack
 
@@ -31,47 +34,64 @@ Rango 0–100 · mayor valor = mayor estrés habitacional · Pesos calibrados co
 |------|-------------|
 | Frontend | React 18 + TypeScript + Vite, Leaflet, Recharts, PWA |
 | Backend | FastAPI + Python 3.12, SQLAlchemy async, Alembic |
-| Base de datos | PostgreSQL 16 + PostGIS |
-| Despliegue | Docker Compose (VPS) · Vercel (frontend) · Render (backend) |
+| Base de datos | PostgreSQL 16 (Railway) — sin PostGIS, geometría como GeoJSON TEXT |
+| Despliegue | Vercel (frontend) · Railway (backend + PostgreSQL) |
+
+## Infraestructura de producción
+
+| Componente | Servicio | Detalles |
+|------------|---------|----------|
+| Frontend | Vercel | Proyecto `frontend`, team `fabrizionbs-projects` |
+| Backend | Railway | Proyecto `sublime-patience`, servicio `alquilersano-backend` |
+| Base de datos | Railway PostgreSQL | Servicio `alquilersano-db`, interno en `alquilersano-db.railway.internal:5432` |
+| CI/CD | GitHub → Railway/Vercel | Push a `master` dispara deploy automático |
 
 ## Estructura
 
 ```
 alquiler/
-├── backend/          # API REST (FastAPI)
+├── backend/
 │   ├── app/
-│   │   ├── api/      # Endpoints: /ier, /alertas, /stats, /barrios, /auth
-│   │   ├── services/ # IERCalculator, ML predictor, repositories, CiudadGPT stub
-│   │   ├── models/   # SQLAlchemy: Barrio, IERScore
-│   │   ├── etl/      # Pipelines de ingesta (Valencia + Madrid + Barcelona)
-│   │   └── core/     # Config, security (JWT), constantes
-│   └── tests/        # 56 tests (pytest)
-├── frontend/         # SPA React
+│   │   ├── api/         # Endpoints: /ier, /alertas, /stats, /barrios, /auth
+│   │   ├── services/    # IERCalculator, repositories
+│   │   ├── models/      # SQLAlchemy: Barrio (geometria=TEXT), IERScore
+│   │   ├── etl/         # Pipelines Valencia (download, clean, geocode, load)
+│   │   └── core/        # Config, security (JWT)
+│   ├── startup.py       # Ejecuta alembic upgrade head al arrancar (solo borra alembic_version)
+│   ├── migrate.py       # Script de migración standalone
+│   ├── Dockerfile       # CMD: python startup.py && uvicorn ...
+│   └── requirements.txt # Sin geoalchemy2 (incompatible con Railway sin PostGIS)
+├── frontend/
 │   ├── src/
 │   │   ├── components/  # MapView, FiltrosPanel, AlertasPanel, charts
 │   │   ├── hooks/       # useIERData, useFilters
-│   │   ├── services/    # api.ts (axios)
-│   │   └── utils/       # ier.ts (colores/etiquetas), csv.ts (export)
-│   └── src/test/     # 38 tests (Vitest + RTL)
-├── docs/             # despliegue.md, validacion_datos.md
+│   │   └── services/    # api.ts → VITE_API_URL (Railway)
+│   └── vercel.json
+├── etl4.js              # ETL Valencia en Node.js (apunta a Railway DB pública)
+├── docs/
 ├── docker-compose.yml
-├── docker-compose.prod.yml
-├── vercel.json
-└── render.yaml
+└── render.yaml          # Obsoleto — backend migrado a Railway
 ```
 
-## Arranque local
+## Datos cargados (producción)
 
-### Requisitos
-- Docker + Docker Compose
-- Node 20+ (solo para desarrollo frontend)
-- Python 3.12+ (solo para desarrollo backend)
+| Dataset | Fuente | Registros | Estado |
+|---------|--------|-----------|--------|
+| Barrios Valencia GeoJSON | Open Data Valencia (`barris-barrios`) | 88 barrios | ✅ |
+| Recibos IBI 2021–2025 | Open Data Valencia (`recibos-ibi-2020-2025`) | 416 registros | ✅ (69/88 barrios con match) |
+| Vulnerabilidad por barrios 2021 | Open Data Valencia (`vulnerabilidad-por-barrios`) | 69 barrios | ✅ |
+| IER scores calculados | Derivado de IBI + vulnerabilidad | 416 registros | ✅ |
+| Madrid / Barcelona | Pendiente | — | ⏳ |
+
+**Nota:** 19 barrios del IBI no coinciden con el GeoJSON por diferencias de nombre (ej. `el cabanyal-el canyamelar` en IBI vs `el cabanyal` en GeoJSON). Ver TODO para el plan de refinación.
+
+## Arranque local
 
 ### Con Docker (recomendado)
 
 ```bash
 cp .env.example .env
-# Edita .env con tus valores
+# Editar .env: DATABASE_URL, SECRET_KEY, VITE_API_URL
 
 docker compose up -d
 # Frontend: http://localhost:5173
@@ -84,43 +104,53 @@ docker compose up -d
 # Backend
 cd backend
 pip install -r requirements.txt
-cp ../.env.example ../.env
 alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 
 # Frontend (otra terminal)
 cd frontend
 npm install
+echo "VITE_API_URL=http://localhost:8000" > .env
 npm run dev
 ```
+
+## Variables de entorno
+
+| Variable | Dónde | Valor producción |
+|----------|-------|-----------------|
+| `VITE_API_URL` | Vercel Env Vars | `https://alquilersano-backend-production.up.railway.app` |
+| `DATABASE_URL` | Railway Env Vars | `postgresql+asyncpg://...@alquilersano-db.railway.internal:5432/railway` |
+| `ALLOWED_ORIGINS` | Railway Env Vars | JSON array con dominios Vercel |
+| `SECRET_KEY` | Railway (auto) | Generado automáticamente |
+
+## ETL — Recargar datos de Valencia
+
+El ETL corre en Node.js directamente contra la DB pública de Railway:
+
+```bash
+cd G:\Proyectos\alquiler
+node etl4.js
+```
+
+**IMPORTANTE:** El `startup.py` del backend borra `alembic_version` en cada deploy, pero NO los datos. El ETL solo recarga si se ejecuta manualmente.
 
 ## Tests
 
 ```bash
-# Backend (56 tests)
+# Backend
 cd backend && pytest -v
 
-# Frontend (38 tests)
+# Frontend
 cd frontend && npm test
 ```
 
-## Despliegue en producción
-
-Ver [`docs/despliegue.md`](docs/despliegue.md) para instrucciones completas de:
-- VPS con Docker Compose + HTTPS (Certbot)
-- Vercel (frontend) + Render (backend + PostgreSQL)
-
 ## Ciudades disponibles
 
-| Ciudad | Datasets | Estado |
-|--------|----------|--------|
-| Valencia | Renta, IBI, Salud Mental, Migrantes | Implementado |
-| Madrid | Renta, Exclusión social | Implementado |
-| Barcelona | Renta, Población | Implementado |
-
-## Contexto del ecosistema
-
-AlquilerSano es la App #1 de un plan de 17 aplicaciones de datos abiertos españoles. Comparte patrones ETL y datasets con SmartZone (#13) y VacíoActivo (#2).
+| Ciudad | Datos IBI | Vulnerabilidad | IER | Estado |
+|--------|-----------|---------------|-----|--------|
+| Valencia | ✅ 2021–2025 | ✅ 2021 | ✅ 416 scores | Operativo |
+| Madrid | ⏳ | ⏳ | ⏳ | Pendiente |
+| Barcelona | ⏳ | ⏳ | ⏳ | Pendiente |
 
 ## Licencia
 
