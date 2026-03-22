@@ -15,14 +15,21 @@ Plataforma web que calcula el IER cruzando datos de gran tenedor (IBI), vulnerab
 
 ### ✅ Completado
 
-- **Frontend** deployado en Vercel: https://frontend-fabrizionbs-projects.vercel.app
+- **Frontend** deployado en Vercel: https://frontend-gamma-khaki-78.vercel.app
 - **Backend** deployado en Railway: https://alquilersano-backend-production.up.railway.app
 - **Base de datos** PostgreSQL en Railway (proyecto `sublime-patience`)
 - **Repositorio GitHub:** https://github.com/argtwo/alquilersano
 - **CI/CD:** Push a `master` → deploy automático en Railway y Vercel
-- **Datos Valencia cargados:** 88 barrios, 416 scores IER (años 2021–2025)
+- **Datos Valencia cargados:** 88 barrios, ~416 scores IER (años 2021–2025)
 - **Geometría** almacenada como GeoJSON texto (sin PostGIS, compatible con Railway)
 - **ETL Node.js** (`etl4.js`) funcional para recargar datos de Valencia
+
+### ⚠️ Problemas detectados en datos actuales
+
+- **8 barrios IBI sin match** por diferencias de nombre (EL CABANYAL-EL CANYAMELAR vs CABANYAL-CANYAMELAR, etc). Diccionario de mapeo identificado, pendiente implementar.
+- **Vulnerabilidad mal mapeada:** `ind_econom` (índice 0-100) se mete en `tasa_pobreza` e `ind_global` en `precariedad_laboral`. El cálculo `Math.min(valor * 0.5, 25)` satura a 25 para casi todos los barrios, eliminando diferenciación.
+- **Año por defecto incorrecto:** Frontend arranca en 2024 pero vulnerabilidad solo existe para 2021 → componente social vacío para 2022-2025.
+- **Año 2020 en selector:** No hay datos IBI para 2020 pero aparece como opción.
 
 ### ⚠️ Notas técnicas importantes
 
@@ -33,46 +40,43 @@ Plataforma web que calcula el IER cruzando datos de gran tenedor (IBI), vulnerab
 
 ---
 
-## TODO — Tareas pendientes por prioridad
+## TODO — Plan de trabajo (ver README.md para detalle completo)
 
-### 🔴 Crítico (bloquea funcionalidad)
+### Fase 1: Corregir datos existentes 🔴 ← PRÓXIMO PASO
 
-- [ ] **Corregir los 19 barrios IBI sin match** — Diferencias de nombre entre el dataset IBI y el GeoJSON de barrios. Ejemplos conocidos:
-  - `el cabanyal-el canyamelar` (IBI) → `el cabanyal` o similar (GeoJSON)
-  - `fonteta de sant lluis` (IBI) → verificar nombre exacto en GeoJSON
-  - `gran via` (IBI) → verificar
-  - `mauella` (IBI) → verificar
-  - `el castellar-l'oliveral` (IBI) → verificar
-  
-  **Plan de acción:** Crear un diccionario de mapeo en `etl4.js` (o en `backend/app/etl/load.py`) con las equivalencias. Ejecutar `node etl4.js` tras el fix para recargar los 19 barrios faltantes. Esto añadirá ~19×5 = ~95 registros IER adicionales y mejorará la cobertura del mapa.
+- [ ] **1.1 — Arreglar matching 8 barrios IBI** — Añadir diccionario de aliases en `etl4.js`. Mapeos confirmados: CIUTAT ARTS I CI NCIES→CIUTAT DE LES ARTS I DE LES CIENCIES, EL CABANYAL-EL CANYAMELAR→CABANYAL-CANYAMELAR, EL CASTELLAR-L'OLIVERAL→CASTELLAR-L'OLIVERAL, FONTETA DE SANT LLUIS→LA FONTETA S.LLUIS, GRAN VIA→LA GRAN VIA, MAUELLA→MAHUELLA-TAULADELLA, MONT-OLIVET→MONTOLIVET, SANT LLOREN→SANT LLORENS
+- [ ] **1.2 — Corregir mapeo vulnerabilidad** — `ind_econom`/`ind_global` son índices 0-100, no porcentajes. Normalizar por max del dataset antes de multiplicar. También mapear MONT-OLIVET→MONTOLIVET para vulnerabilidad.
+- [ ] **1.3 — Recalcular IER** — Ejecutar `node etl4.js` tras los fixes.
 
-- [ ] **Verificar que el año por defecto (2024) tiene datos** — La app filtra por `year=2024` por defecto pero el IBI solo tiene datos 2021–2025. Confirmar qué años tienen IER scores y ajustar el año por defecto en el frontend si es necesario.
+### Fase 2: Enriquecer datos Valencia 🟡
 
-### 🟡 Importante (mejora significativa)
+- [ ] **2.1** — Cargar precio vivienda libre/m² (`habitatge-lliure-preu-metre-quadrat`)
+- [ ] **2.2** — Cargar demografía por manzana → agregar por barrio (`illes-amb-dades-de-poblacio`)
+- [ ] **2.3** — Evaluar Recibos IAE por barrio (`recibos_iae_2020-2025`)
+- [ ] **2.4** — Evaluar VPP distribución (`vivendes-proteccio-publica-vpp`)
+- [ ] **2.5** — Rediseñar fórmula IER con datos reales
 
-- [ ] **Añadir datos de renta por barrio** — El dataset `renda-per-llar-i-persona` no tiene desglose por barrio (solo datos globales de Valencia). Buscar en el catálogo (`scrap datasets/datasets catalogo valencia.csv`) un dataset alternativo con renta por barrio o sección censal.
+### Fase 3: Pulir frontend Valencia 🟢
 
-- [ ] **Cargar datos Madrid** — El `render.yaml` y el ETL tienen esqueleto para Madrid. Adaptar `etl4.js` para `madrid_exclusion` y `madrid_renta` siguiendo el mismo patrón que Valencia.
+- [ ] **3.1** — Cambiar año por defecto a 2021 (o auto-detectar año con más datos)
+- [ ] **3.2** — Quitar 2020 del selector (no hay datos)
+- [ ] **3.3** — Mostrar cobertura de datos ("87/88 barrios con IBI")
+- [ ] **3.4** — Desglose componentes IER en modal de barrio
+- [ ] **3.5** — Vista ranking (tabla ordenable)
 
-- [ ] **Cargar datos Barcelona** — Similar a Madrid.
+### Fase 4: Multi-ciudad ⏳ (después de Valencia completo)
 
-- [ ] **Añadir salud mental real** — El dataset `malaltia-mental-enfermedad-mental` devuelve puntos de equipamientos (centros), no indicadores por barrio. Buscar alternativa con casos/tasa por barrio.
+- [ ] Refactorizar ETL parametrizable
+- [ ] Cargar Madrid
+- [ ] Cargar Barcelona
+- [ ] Desactivar opciones sin datos en selector ciudad
 
-### 🟢 Mejoras (calidad y mantenimiento)
+### Mejoras técnicas (cuando haya hueco)
 
-- [ ] **Eliminar `startup.py` drop de alembic_version** — Es un workaround temporal. Migrar a un sistema más robusto: detectar si las tablas existen y solo correr migraciones nuevas.
-
-- [ ] **Mover ETL a Railway Jobs** — El ETL actualmente se ejecuta manualmente desde local. Convertirlo en un Railway Cron Job que se ejecute mensualmente para actualizar datos.
-
-- [ ] **Refinar el cálculo del IER** — La fórmula actual usa `pct_persona_juridica` como proxy de presión de alquiler. Implementar la fórmula FOESSA completa cuando se tenga el dato de coste de alquiler por barrio.
-
-- [ ] **Añadir datos históricos** — El IBI tiene datos 2021–2025. Mostrar el histórico IER por barrio en el panel de detalle.
-
-- [ ] **Desactivar Vercel Authentication** — Los assets estáticos del deployment están protegidos. Ir a Vercel → Deployment Protection y desactivar o limitar a preview deployments.
-
-- [ ] **Limpiar archivos ETL temporales** — `etl_node.js`, `etl2.js`, `etl3.js`, `etl4.js` en la raíz del proyecto. Consolidar en un único `etl.js` bien documentado o mover a `backend/scripts/`.
-
-- [ ] **Añadir CORS dinámico** — El `ALLOWED_ORIGINS` está hardcodeado con URLs de Vercel. Usar wildcard `*.vercel.app` para no tener que actualizar en cada redeploy.
+- [ ] Eliminar `startup.py` drop de alembic_version
+- [ ] Mover ETL a Railway Jobs
+- [ ] Limpiar ETL temporales (etl_node.js, etl2.js, etl3.js → consolidar)
+- [ ] CORS dinámico con wildcard *.vercel.app
 
 ---
 

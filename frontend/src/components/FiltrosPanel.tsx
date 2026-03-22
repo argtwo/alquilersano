@@ -6,7 +6,7 @@ interface Props {
   distritos: string[]
 }
 
-const ANYO_OPTIONS = [2020, 2021, 2022, 2023, 2024, 2025]
+const ANYO_OPTIONS = [2021, 2022, 2023, 2024, 2025]
 
 const CIUDADES: { value: Ciudad; label: string }[] = [
   { value: 'valencia',  label: 'Valencia' },
@@ -15,7 +15,7 @@ const CIUDADES: { value: Ciudad; label: string }[] = [
 ]
 
 const DEFAULT_FILTROS: FiltrosMapaState = {
-  anyo: 2024,
+  anyo: 2025,
   minIER: 0,
   maxIER: 100,
   riesgoDesahucio: 'TODOS',
