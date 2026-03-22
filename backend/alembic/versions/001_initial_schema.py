@@ -17,13 +17,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Intentar activar PostGIS — si no está disponible, continuar sin geometría
-    try:
-        op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
-        geom_type = sa.Text()  # se reemplaza abajo si postgis está disponible
-        use_postgis = True
-    except Exception:
-        use_postgis = False
 
     op.create_table(
         "barrios",
@@ -116,4 +109,3 @@ def downgrade() -> None:
     op.drop_table("indicadores_salud_mental")
     op.drop_table("indicadores_renta")
     op.drop_table("barrios")
-    op.execute("DROP EXTENSION IF EXISTS postgis")
