@@ -23,6 +23,6 @@ export const api = {
   getAlertas: (year: number) =>
     client.get<BarrioConIER[]>('/api/v1/alertas', { params: { year } }).then((r) => r.data),
 
-  getStats: (year: number) =>
-    client.get<CityStats>('/api/v1/stats', { params: { year } }).then((r) => r.data),
+  getStats: (year: number, ciudad?: string) =>
+    client.get<CityStats>('/api/v1/stats', { params: { year, ciudad } }).then((r) => r.data),
 }

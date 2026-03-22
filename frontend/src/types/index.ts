@@ -1,4 +1,4 @@
-export type Ciudad = 'valencia' | 'madrid' | 'barcelona'
+export type Ciudad = 'valencia' | 'valencia_provincia' | 'madrid' | 'barcelona'
 
 export interface Barrio {
   id: number

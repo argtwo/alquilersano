@@ -9,9 +9,10 @@ interface Props {
 const ANYO_OPTIONS = [2021, 2022, 2023, 2024, 2025]
 
 const CIUDADES: { value: Ciudad; label: string }[] = [
-  { value: 'valencia',  label: 'Valencia' },
-  { value: 'madrid',    label: 'Madrid' },
-  { value: 'barcelona', label: 'Barcelona' },
+  { value: 'valencia',           label: 'Valencia (barrios)' },
+  { value: 'valencia_provincia', label: 'Provincia Valencia (municipios)' },
+  { value: 'madrid',             label: 'Madrid' },
+  { value: 'barcelona',          label: 'Barcelona' },
 ]
 
 const DEFAULT_FILTROS: FiltrosMapaState = {

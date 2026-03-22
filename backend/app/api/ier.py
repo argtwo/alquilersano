@@ -25,7 +25,7 @@ async def get_ier_mapa(
     min_ier: float = Query(default=0, ge=0, le=100),
     max_ier: float = Query(default=100, ge=0, le=100),
     distrito: str | None = None,
-    ciudad: str | None = Query(default=None, description="Filtrar por ciudad: valencia, madrid, barcelona"),
+    ciudad: str | None = Query(default=None, description="Filtrar por ciudad: valencia, valencia_provincia, madrid, barcelona"),
     db: AsyncSession = Depends(get_db),
 ):
     """

@@ -23,7 +23,7 @@ export default function App() {
   const [barrioSeleccionado, setBarrioSeleccionado] = useState<BarrioConIER | null>(null)
 
   const { data, loading, error } = useIERData(filtros)
-  const stats = useStats(filtros.anyo)
+  const stats = useStats(filtros.anyo, filtros.ciudad)
 
   // Lista de distritos únicos para el selector de filtros
   const distritos = useMemo(() => {
