@@ -6,15 +6,17 @@ import type { BarrioConIER, Ciudad } from '../types'
 import { ierToColor, ierToLabel, RIESGO_COLORS } from '../utils/ier'
 
 const CIUDAD_CENTER: Record<Ciudad, [number, number]> = {
-  valencia:  [39.4699, -0.3763],
-  madrid:    [40.4168, -3.7038],
-  barcelona: [41.3851, 2.1734],
+  valencia:            [39.4699, -0.3763],
+  valencia_provincia:  [39.35, -0.75],
+  madrid:              [40.4168, -3.7038],
+  barcelona:           [41.3851, 2.1734],
 }
 
 const CIUDAD_ZOOM: Record<Ciudad, number> = {
-  valencia:  13,
-  madrid:    12,
-  barcelona: 13,
+  valencia:            13,
+  valencia_provincia:  9,
+  madrid:              12,
+  barcelona:           13,
 }
 
 interface Props {

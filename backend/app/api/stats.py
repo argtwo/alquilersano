@@ -14,9 +14,10 @@ router = APIRouter(prefix="/stats", tags=["stats"])
 @router.get("", response_model=StatsSchema)
 async def city_stats(
     year: int = Query(default=2025, ge=2021, le=2025),
+    ciudad: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
     """
     Estadísticas globales: IER medio, mínimo, máximo y distribución de riesgo.
     """
-    return await get_stats(db, year)
+    return await get_stats(db, year, ciudad)
