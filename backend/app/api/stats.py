@@ -13,7 +13,7 @@ router = APIRouter(prefix="/stats", tags=["stats"])
 
 @router.get("", response_model=StatsSchema)
 async def city_stats(
-    year: int = Query(default=2025, ge=2021, le=2025),
+    year: int = Query(default=2025, ge=2015, le=2025),
     ciudad: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):

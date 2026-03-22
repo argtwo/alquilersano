@@ -6,7 +6,19 @@ interface Props {
   distritos: string[]
 }
 
-const ANYO_OPTIONS = [2021, 2022, 2023, 2024, 2025]
+const ANYO_OPTIONS: Record<string, number[]> = {
+  valencia:            [2021, 2022, 2023, 2024, 2025],
+  valencia_provincia:  [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
+  madrid:              [2021, 2022, 2023, 2024, 2025],
+  barcelona:           [2021, 2022, 2023, 2024, 2025],
+}
+
+const ANYO_DEFAULT: Record<string, number> = {
+  valencia: 2025,
+  valencia_provincia: 2023,
+  madrid: 2025,
+  barcelona: 2025,
+}
 
 const CIUDADES: { value: Ciudad; label: string }[] = [
   { value: 'valencia',           label: 'Valencia (barrios)' },
@@ -46,7 +58,11 @@ export default function FiltrosPanel({ filtros, onChange, distritos }: Props) {
           <select
             className="filtro-select"
             value={filtros.ciudad ?? 'valencia'}
-            onChange={(e) => onChange({ ciudad: e.target.value as Ciudad, distrito: null })}
+            onChange={(e) => {
+              const newCiudad = e.target.value as Ciudad;
+              const newAnyo = ANYO_DEFAULT[newCiudad] || 2023;
+              onChange({ ciudad: newCiudad, distrito: null, anyo: newAnyo });
+            }}
           >
             {CIUDADES.map((c) => (
               <option key={c.value} value={c.value}>{c.label}</option>
@@ -62,7 +78,7 @@ export default function FiltrosPanel({ filtros, onChange, distritos }: Props) {
             value={filtros.anyo}
             onChange={(e) => onChange({ anyo: +e.target.value })}
           >
-            {ANYO_OPTIONS.map((y) => (
+            {(ANYO_OPTIONS[filtros.ciudad ?? 'valencia'] || ANYO_OPTIONS.valencia).map((y) => (
               <option key={y} value={y}>{y}</option>
             ))}
           </select>

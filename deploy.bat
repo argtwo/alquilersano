@@ -1,4 +1,5 @@
 cd /d G:\Proyectos\alquiler
+del debug_api.js 2>nul
 git add -A
-git commit -m "feat: municipios provincia Valencia - ETL + frontend selector + stats por ciudad"
+git commit -m "fix: frontend-year-per-city backend-ge2015 IER-percentile-formula"
 git push origin master

@@ -171,39 +171,50 @@ async function main() {
   `);
   console.log(`  Filas para IER: ${dataRes.rows.length}`);
 
-  // Normalize values for IER calculation
+  // Normalize using percentile ranks for better distribution
   const rows = dataRes.rows;
   
-  // Find max values for normalization
-  const rentaVals = rows.map(r => parseFloat(r.renta_media_hogar) || 0).filter(v => v > 0);
-  const pobrezaVals = rows.map(r => parseFloat(r.tasa_pobreza) || 0).filter(v => v > 0);
-  const giniVals = rows.map(r => parseFloat(r.precariedad_laboral) || 0).filter(v => v > 0);
+  // Helper: compute percentile rank (0-1) within a set of values
+  function percentileRank(value, allValues) {
+    if (!value || allValues.length === 0) return null;
+    const sorted = [...allValues].sort((a, b) => a - b);
+    const idx = sorted.findIndex(v => v >= value);
+    return idx >= 0 ? idx / (sorted.length - 1) : 1;
+  }
+
+  // Group values by year for year-relative percentiles
+  const byYear = {};
+  for (const r of rows) {
+    if (!byYear[r.anyo]) byYear[r.anyo] = { rentas: [], pobrezas: [], ginis: [] };
+    const renta = parseFloat(r.renta_media_hogar) || 0;
+    const pob = parseFloat(r.tasa_pobreza) || 0;
+    const gini = parseFloat(r.precariedad_laboral) || 0;
+    if (renta > 0) byYear[r.anyo].rentas.push(renta);
+    if (pob > 0) byYear[r.anyo].pobrezas.push(pob);
+    if (gini > 0) byYear[r.anyo].ginis.push(gini);
+  }
   
-  const rentaMax = Math.max(...rentaVals, 1);
-  const rentaMin = Math.min(...rentaVals.filter(v => v > 0));
-  const pobrezaMax = Math.max(...pobrezaVals, 1);
-  const giniMax = Math.max(...giniVals, 1);
-  
-  console.log(`  Renta hogar: min=${rentaMin} max=${rentaMax}`);
-  console.log(`  Pobreza (% bajo 60% mediana): max=${pobrezaMax}`);
-  console.log(`  Gini: max=${giniMax}`);
+  console.log(`  Años con datos:`, Object.keys(byYear).sort().join(', '));
 
   let ierOk = 0;
   for (const row of rows) {
     const renta = parseFloat(row.renta_media_hogar) || 0;
     const pobreza = parseFloat(row.tasa_pobreza) || 0;
     const gini = parseFloat(row.precariedad_laboral) || 0;
+    const yr = byYear[row.anyo];
 
-    // IER Municipal:
-    // compAlquiler (0-50): inverse of renta (lower renta = higher stress)
-    // Higher renta = lower stress, so we invert: (1 - renta/max) * 50
-    const compAlquiler = renta > 0 ? (1 - (renta - rentaMin) / (rentaMax - rentaMin)) * 50 : 25;
+    // compAlquiler (0-40): inverse percentile of renta (lower renta = higher stress)
+    // Percentile 0 (poorest) → 40, Percentile 1 (richest) → 0
+    const rentaPct = renta > 0 ? percentileRank(renta, yr.rentas) : 0.5;
+    const compAlquiler = (1 - rentaPct) * 40;
     
-    // compPrecariedad (0-25): poverty rate normalized
-    const compPrec = pobreza > 0 ? (pobreza / pobrezaMax) * 25 : 0;
+    // compPrecariedad (0-35): percentile of poverty rate (higher = more stress)
+    const pobPct = pobreza > 0 ? percentileRank(pobreza, yr.pobrezas) : null;
+    const compPrec = pobPct !== null ? pobPct * 35 : 0;
     
-    // compSocial (0-25): Gini normalized (higher Gini = more inequality = more stress)
-    const compSocial = gini > 0 ? (gini / giniMax) * 25 : 0;
+    // compSocial (0-25): percentile of Gini (higher inequality = more stress)
+    const giniPct = gini > 0 ? percentileRank(gini, yr.ginis) : null;
+    const compSocial = giniPct !== null ? giniPct * 25 : 0;
 
     const ier = Math.round((compAlquiler + compPrec + compSocial) * 10) / 10;
     const riesgo = ier >= 75 ? 'CRÍTICO' : ier >= 50 ? 'ALTO' : ier >= 25 ? 'MEDIO' : 'BAJO';
