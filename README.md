@@ -1,380 +1,100 @@
-# AlquilerSano — Índice de Estrés Habitacional por Barrio
+# AlquilerSano — Índice de Estrés Habitacional
 
-Plataforma web que calcula el **Índice de Estrés Residencial (IER)** por barrio, cruzando datos de gran tenedor (IBI), vulnerabilidad económica e indicadores de exclusión social. Visualiza un mapa de calor de vulnerabilidad con granularidad de barrio para Valencia, Madrid y Barcelona.
+Plataforma web que calcula el **Índice de Estrés Residencial (IER)** por municipio y barrio, cruzando datos de renta (ADRH/INE), pobreza, desigualdad (Gini) y vulnerabilidad. Visualiza un mapa de calor interactivo de la Comunidad Valenciana.
 
-> Contexto: el 20% de hogares con bajos ingresos en España destina más del 70% de su renta al alquiler (FOESSA 2025).
+> El 20% de hogares con bajos ingresos en España destina más del 70% de su renta al alquiler (FOESSA 2025).
 
-## 🌐 Links en producción
+## 🌐 Links
 
 | Servicio | URL |
 |----------|-----|
-| **Frontend (Vercel)** | https://frontend-gamma-khaki-78.vercel.app |
-| **Backend (Railway)** | https://alquilersano-backend-production.up.railway.app |
+| **Frontend** | https://frontend-gamma-khaki-78.vercel.app |
+| **Backend API** | https://alquilersano-backend-production.up.railway.app |
 | **API Docs** | https://alquilersano-backend-production.up.railway.app/docs |
-| **Repositorio GitHub** | https://github.com/argtwo/alquilersano |
+| **GitHub** | https://github.com/argtwo/alquilersano |
 
-## Fórmula IER
+## Datos cargados (23 marzo 2026)
 
-```
-IER = compAlquiler(gran_tenedor) + compPrecariedad(vulnerabilidad_económica) + compSocial(exclusión)
-```
+| Ámbito | Fuente | Registros | IER |
+|--------|--------|-----------|-----|
+| **Valencia barrios** | Open Data Valencia (IBI + vulnerabilidad) | 87 barrios × 5 años | ✅ 3.0–82.8 |
+| **CV municipios** | ADRH/INE (renta + pobreza + Gini) | 534 municipios × 9 años | ✅ 0.2–94.3 |
+| Madrid / Barcelona | Pendiente | — | ⏳ |
 
-Rango 0–100 · mayor valor = mayor estrés habitacional.
-
-| Rango IER | Etiqueta | Color |
-|-----------|----------|-------|
-| 0–24 | Bajo | Verde |
-| 25–49 | Moderado | Amarillo |
-| 50–74 | Alto | Naranja |
-| 75–100 | Crítico | Rojo |
+### Distribución IER municipios CV (2023)
+- **BAJO** (0–24): 67 municipios
+- **MEDIO** (25–49): 291 municipios
+- **ALTO** (50–74): 169 municipios
+- **CRÍTICO** (75–100): 7 municipios
 
 ## Stack
 
 | Capa | Tecnologías |
 |------|-------------|
-| Frontend | React 18 + TypeScript + Vite, Leaflet, Recharts, PWA |
+| Frontend | React 18 + TypeScript + Vite, Leaflet, Recharts |
 | Backend | FastAPI + Python 3.12, SQLAlchemy async, Alembic |
-| Base de datos | PostgreSQL 16 (Railway) — sin PostGIS, geometría como GeoJSON TEXT |
+| DB | PostgreSQL 16 (Railway) — sin PostGIS, geometría como GeoJSON TEXT |
+| ETL | Node.js (descarga INE + carga DB) |
 | Despliegue | Vercel (frontend) · Railway (backend + PostgreSQL) |
 
-## Infraestructura de producción
+## Fórmula IER
 
-| Componente | Servicio | Detalles |
-|------------|---------|----------|
-| Frontend | Vercel | Proyecto `frontend`, team `fabrizionbs-projects` |
-| Backend | Railway | Proyecto `sublime-patience`, servicio `alquilersano-backend` |
-| Base de datos | Railway PostgreSQL | Servicio `alquilersano-db`, interno en `alquilersano-db.railway.internal:5432` |
-| CI/CD | GitHub → Railway/Vercel | Push a `master` dispara deploy automático |
-
-## Estructura
-
+**Municipios CV** (basado en ADRH del INE, percentiles):
 ```
-alquiler/
-├── backend/
-│   ├── app/
-│   │   ├── api/         # Endpoints: /ier, /alertas, /stats, /barrios, /auth
-│   │   ├── services/    # IERCalculator, repositories
-│   │   ├── models/      # SQLAlchemy: Barrio (geometria=TEXT), IERScore
-│   │   ├── etl/         # Pipelines Valencia (download, clean, geocode, load)
-│   │   └── core/        # Config, security (JWT)
-│   ├── startup.py       # Ejecuta alembic upgrade head al arrancar (solo borra alembic_version)
-│   ├── migrate.py       # Script de migración standalone
-│   ├── Dockerfile       # CMD: python startup.py && uvicorn ...
-│   └── requirements.txt # Sin geoalchemy2 (incompatible con Railway sin PostGIS)
-├── frontend/
-│   ├── src/
-│   │   ├── components/  # MapView, FiltrosPanel, AlertasPanel, charts
-│   │   ├── hooks/       # useIERData, useFilters
-│   │   └── services/    # api.ts → VITE_API_URL (Railway)
-│   └── vercel.json
-├── etl4.js              # ETL Valencia en Node.js (apunta a Railway DB pública)
-├── docs/
-├── docker-compose.yml
-└── render.yaml          # Obsoleto — backend migrado a Railway
+IER = compRenta(0–40) + compPobreza(0–35) + compGini(0–25) = 0–100
+```
+- compRenta: percentil inverso de renta neta por hogar (menor renta = más estrés)
+- compPobreza: percentil de % población bajo 60% mediana
+- compGini: percentil del índice de Gini
+
+**Barrios Valencia** (basado en IBI + vulnerabilidad Open Data):
+```
+IER = compAlquiler(0–50) + compPrecariedad(0–25) + compSocial(0–25)
 ```
 
-## Datos cargados (producción)
-
-| Dataset | Fuente | Registros | Estado |
-|---------|--------|-----------|--------|
-| Barrios Valencia GeoJSON | Open Data Valencia (`barris-barrios`) | 88 barrios | ✅ |
-| Recibos IBI 2021–2025 | Open Data Valencia (`recibos-ibi-2020-2025`) | ~416 registros | ⚠️ 8 barrios sin match (ver TODO) |
-| Vulnerabilidad por barrios 2021 | Open Data Valencia (`vulnerabilidad-por-barrios`) | 70 barrios | ⚠️ ind_econom/ind_global mal mapeados |
-| IER scores calculados | Derivado de IBI + vulnerabilidad | ~416 registros | ⚠️ Cálculo usa datos incorrectos |
-| Vivienda libre precio/m² | Open Data Valencia (`habitatge-lliure-preu-metre-quadrat`) | Pendiente | ⏳ |
-| Población por manzanas | Open Data Valencia (`illes-amb-dades-de-poblacio-manzanas-con-datos-de-poblacion`) | Pendiente | ⏳ |
-| Madrid / Barcelona | Pendiente | — | ⏳ |
-
----
-
-## 🗺️ PLAN: Completar Valencia (prioridad actual)
-
-### Fase 1: Corregir datos existentes 🔴
-
-#### 1.1 — Arreglar matching de 8 barrios IBI
-**Estado:** Pendiente confirmación del usuario para 1 caso (MAUELLA → MAHUELLA-TAULADELLA)
-
-Diccionario de mapeo a añadir en `etl4.js`:
-```
-IBI                           → GeoJSON
-CIUTAT ARTS I CI NCIES        → CIUTAT DE LES ARTS I DE LES CIENCIES
-EL CABANYAL-EL CANYAMELAR     → CABANYAL-CANYAMELAR
-EL CASTELLAR-L'OLIVERAL       → CASTELLAR-L'OLIVERAL
-FONTETA DE SANT LLUIS         → LA FONTETA S.LLUIS
-GRAN VIA                      → LA GRAN VIA
-MAUELLA                       → MAHUELLA-TAULADELLA (pendiente confirmar)
-MONT-OLIVET                   → MONTOLIVET
-SANT LLOREN                   → SANT LLORENS
-```
-Impacto: +8 barrios × 5 años = ~40 registros IER más. Cobertura pasa de 80/88 a 87/88 (solo RAFALELL-VISTABELLA queda sin datos IBI).
-
-#### 1.2 — Corregir mapeo de vulnerabilidad
-El ETL actual (`etl4.js`) mete `ind_econom` → `tasa_pobreza` e `ind_global` → `precariedad_laboral`. Estos son **índices compuestos (0-100)**, no porcentajes. El cálculo `Math.min(valor * 0.5, 25)` satura a 25 para casi todos los barrios, eliminando diferenciación.
-
-**Plan:** Normalizar `ind_econom` e `ind_global` dividiendo por el máximo del dataset antes de aplicar el multiplicador. Así el barrio más vulnerable tiene 25 y los demás se escalan proporcionalmente.
-
-También: añadir mapeo `MONT-OLIVET → MONTOLIVET` para vulnerabilidad.
-
-#### 1.3 — Recalcular IER con datos corregidos
-Tras 1.1 y 1.2, ejecutar `node etl4.js` para regenerar todos los scores.
-
-### Fase 2: Enriquecer datos Valencia 🟡
-
-#### 2.1 — Añadir precio vivienda libre por m²
-Dataset: `habitatge-lliure-preu-metre-quadrat` — precio medio del m² de vivienda libre.
-Puede servir como proxy de presión inmobiliaria por zona. Evaluar si tiene desglose por barrio o solo global.
-
-#### 2.2 — Añadir datos de población por manzana
-Dataset: `illes-amb-dades-de-poblacio-manzanas-con-datos-de-poblacion` — manzanas con datos demográficos.
-Agregar por barrio para obtener densidad, envejecimiento, etc. Útil para ponderar el IER por población afectada.
-
-#### 2.3 — Explorar Recibos IAE por barrio
-Dataset: `recibos_iae_2020-2025` — Impuesto de Actividades Económicas.
-Puede indicar actividad económica del barrio (más actividad = más servicios = menos exclusión).
-
-#### 2.4 — Explorar VPP (Viviendas de Protección Pública)
-Dataset: `vivendes-proteccio-publica-vpp-viviendas-proteccion-publica-vpp`
-Distribución de vivienda social por barrio. Un barrio con más VPP puede tener más vulnerabilidad o más protección, según se mire.
-
-#### 2.5 — Mejorar fórmula IER con datos reales
-Con los datasets 2.1-2.4 cargados, rediseñar los componentes del IER:
-- **compAlquiler**: precio m² × pct_persona_juridica (presión especulativa real, no solo proxy IBI)
-- **compPrecariedad**: ind_econom normalizado + indicadores demográficos
-- **compSocial**: ind_global normalizado + VPP + IAE (actividad económica)
-
-### Fase 3: Pulir frontend Valencia 🟢
-
-#### 3.1 — Ajustar año por defecto
-Cambiar `DEFAULT_FILTROS.anyo` de 2024 a 2021 (único año con datos de vulnerabilidad), o mejor: detectar automáticamente el año con más datos completos.
-
-#### 3.2 — Quitar año 2020 del selector
-Los datos IBI son 2021-2025. El filtro ofrece 2020 pero no hay datos. Ajustar `ANYO_OPTIONS`.
-
-#### 3.3 — Mostrar cobertura de datos
-Indicar en el UI cuántos barrios tienen datos completos vs parciales para el año seleccionado.
-Ej: "87/88 barrios con IBI · 70/88 con vulnerabilidad"
-
-#### 3.4 — Panel de detalle: mostrar componentes IER
-El modal de detalle del barrio debería mostrar un desglose visual de los 3 componentes del IER (alquiler, precariedad, social) con barras o gauge.
-
-#### 3.5 — Ranking de barrios
-Añadir una vista de ranking (tabla ordenable) además del mapa, para comparar barrios rápidamente.
-
-### Fase 4: Preparar para multi-ciudad (después de Valencia) ⏳
-
-#### 4.1 — Refactorizar ETL para ser multi-ciudad
-Convertir `etl4.js` en un ETL parametrizable: `node etl.js --city=valencia|madrid|barcelona`
-
-#### 4.2 — Cargar Madrid
-Datasets de Madrid Open Data: IBI, vulnerabilidad, barrios GeoJSON.
-
-#### 4.3 — Cargar Barcelona
-Datasets de Barcelona Open Data.
-
-#### 4.4 — Selector de ciudad funcional
-El frontend ya tiene el selector pero Madrid/Barcelona no tienen datos. Desactivar las opciones sin datos o mostrar "Próximamente".
-
----
-
-## Datasets disponibles en Open Data Valencia (relevantes)
-
-| Dataset ID | Descripción | Uso potencial |
-|-----------|-------------|---------------|
-| `barris-barrios` | GeoJSON 88 barrios | ✅ Ya cargado |
-| `recibos-ibi-2020-2025` | IBI por barrio y año | ✅ Ya cargado (parcial) |
-| `vulnerabilidad-por-barrios` | Índices vulnerabilidad 2021 | ✅ Ya cargado (mal mapeado) |
-| `habitatge-lliure-preu-metre-quadrat` | Precio vivienda libre/m² | ⏳ Evaluar granularidad |
-| `illes-amb-dades-de-poblacio-manzanas-con-datos-de-poblacion` | Demografía por manzana | ⏳ Agregar por barrio |
-| `recibos_iae_2020-2025` | Actividad económica por barrio | ⏳ Proxy exclusión |
-| `vivendes-proteccio-publica-vpp-viviendas-proteccion-publica-vpp` | Vivienda protegida | ⏳ Complemento social |
-| `renda-per-llar-i-persona` | Renta por hogar/persona | ⚠️ Solo dato global, sin barrio |
-| `seccions-censals-secciones-censales` | Secciones censales geom. | 🔍 Para cruzar datos INE |
-| `1_1` | Población en riesgo de pobreza | 🔍 Evaluar si tiene barrio |
-
-
-## Matching barrios IBI ↔ GeoJSON
-
-8 barrios del IBI no matchean con el GeoJSON por diferencias de nombre:
-
-| IBI | GeoJSON | Estado |
-|-----|---------|--------|
-| CIUTAT ARTS I CI NCIES | CIUTAT DE LES ARTS I DE LES CIENCIES | ✅ Obvio |
-| EL CABANYAL-EL CANYAMELAR | CABANYAL-CANYAMELAR | ✅ Obvio |
-| EL CASTELLAR-L'OLIVERAL | CASTELLAR-L'OLIVERAL | ✅ Obvio |
-| FONTETA DE SANT LLUIS | LA FONTETA S.LLUIS | ✅ Obvio |
-| GRAN VIA | LA GRAN VIA | ✅ Obvio |
-| MAUELLA | MAHUELLA-TAULADELLA | ⚠️ Confirmado por usuario |
-| MONT-OLIVET | MONTOLIVET | ✅ Obvio |
-| SANT LLOREN | SANT LLORENS | ✅ Obvio |
-
-Barrio GeoJSON sin datos IBI: **RAFALELL-VISTABELLA** (pedanía rural, sin recibos IBI propios).
-
-## Arranque local
-
-### Con Docker (recomendado)
+## Scripts ETL
 
 ```bash
-cp .env.example .env
-# Editar .env: DATABASE_URL, SECRET_KEY, VITE_API_URL
+# Barrios Valencia ciudad (IBI + vulnerabilidad)
+node etl4.js
 
-docker compose up -d
-# Frontend: http://localhost:5173
-# Backend API: http://localhost:8000/docs
+# Municipios CV completa (ADRH INE — 3 provincias)
+node etl_municipios_cv.js
+
+# Descargar datos INE
+node --max-old-space-size=4096 download_all_nacional.js          # Valencia
+node --max-old-space-size=4096 download_alicante_castellon.js    # Alicante + Castellón
 ```
 
-### Sin Docker
+## Tablas ADRH del INE por provincia
+
+El INE organiza el ADRH en tablas separadas por provincia. IDs confirmados:
+
+| Provincia | Renta | Pobreza | Gini | Municipios |
+|-----------|-------|---------|------|------------|
+| Alicante (03) | 30833 | 30838 | 37733 | 141 |
+| Castellón (12) | 30962 | 30967 | 37691 | 135 |
+| Valencia (46) | 31250 | 31255 | 37721 | 264 |
+
+## Desarrollo local
 
 ```bash
 # Backend
-cd backend
-pip install -r requirements.txt
-alembic upgrade head
-uvicorn app.main:app --reload --port 8000
+cd backend && pip install -r requirements.txt
+DATABASE_URL=postgresql+asyncpg://... uvicorn app.main:app --reload --port 8000
 
-# Frontend (otra terminal)
-cd frontend
-npm install
-echo "VITE_API_URL=http://localhost:8000" > .env
-npm run dev
+# Frontend
+cd frontend && npm install
+echo "VITE_API_URL=http://localhost:8000" > .env && npm run dev
 ```
 
 ## Variables de entorno
 
-| Variable | Dónde | Valor producción |
-|----------|-------|-----------------|
-| `VITE_API_URL` | Vercel Env Vars | `https://alquilersano-backend-production.up.railway.app` |
-| `DATABASE_URL` | Railway Env Vars | `postgresql+asyncpg://...@alquilersano-db.railway.internal:5432/railway` |
-| `ALLOWED_ORIGINS` | Railway Env Vars | JSON array con dominios Vercel |
-| `SECRET_KEY` | Railway (auto) | Generado automáticamente |
-
-## ETL — Recargar datos de Valencia
-
-```bash
-cd G:\Proyectos\alquiler
-node etl4.js
-```
-
-## Ciudades disponibles
-
-| Ciudad | Datos IBI | Vulnerabilidad | IER | Estado |
-|--------|-----------|---------------|-----|--------|
-| Valencia | ✅ 2021–2025 | ✅ 2021 | ⚠️ Requiere recálculo | En corrección |
-| Madrid | ⏳ | ⏳ | ⏳ | Pendiente |
-| Barcelona | ⏳ | ⏳ | ⏳ | Pendiente |
-
----
-
-## 🚀 FASE 5: Escalar a toda la Comunidad Valenciana (y más allá)
-
-### El problema actual
-Los datos de Open Data **Valencia ciudad** solo cubren los 88 barrios del término municipal. Municipios como Xirivella, Picanya, Paiporta, Torrent, Mislata, etc. no aparecen porque son municipios independientes, no barrios de Valencia.
-
-### La solución: datasets nacionales/autonómicos
-
-**¡ES POSIBLE!** Existen datasets de alcance nacional que cubren TODOS los municipios de España, a nivel de municipio e incluso sección censal. La clave es combinar:
-
-#### Fuentes de datos confirmadas
-
-| Dataset | Fuente | Granularidad | Indicadores | Formato | URL |
-|---------|--------|-------------|-------------|---------|-----|
-| **ADRH** (Atlas Distribución Renta Hogares) | INE | Sección censal, distrito, municipio | Renta media, mediana, Gini, % pobreza, demografía | CSV/PC-Axis | ine.es/dynt3/inebase (serie 2015-2023) |
-| **Estadísticas catastrales: Titulares** | DG Catastro | Municipio | Titulares persona física/jurídica, nº inmuebles por tramo | PC-Axis/DBF | catastro.hacienda.gob.es/esp/estadisticas.asp |
-| **Estadísticas IBI** | DG Catastro | Municipio | Recaudación IBI, nº recibos, valor catastral | PC-Axis | catastro.hacienda.gob.es/esp/estadistica_6.asp |
-| **IRPF por municipio** | AEAT | Municipio (>1000 hab) | Renta bruta media, renta disponible, componentes | CSV | sede.agenciatributaria.gob.es |
-| **IRPF por código postal** | AEAT | Código postal (grandes municipios) | Renta bruta por distrito postal | CSV | sede.agenciatributaria.gob.es |
-| **GeoJSON municipios CV** | GVA (dadesobertes) | Municipio | Geometría de los 542 municipios de la CV | GeoJSON | dadesobertes.gva.es/dataset/sanidad-sip-municipios |
-| **Secciones censales** | INE/Catastro | Sección censal | Geometría | SHP/GeoJSON | Varias fuentes |
-
-#### Cambio de modelo: de barrio a municipio
-
-Para cubrir Xirivella, Picanya, etc., el enfoque cambia:
-
-**Nivel 1 — Municipios de la CV (542 municipios):**
-- GeoJSON de municipios ya disponible en dadesobertes.gva.es
-- ADRH del INE tiene renta por municipio para TODOS (serie 2015-2023)
-- Catastro tiene IBI y titulares por municipio
-- IRPF de la AEAT tiene renta por municipio (+1000 hab)
-- Resultado: IER a nivel municipal para toda la Comunidad Valenciana
-
-**Nivel 2 — Barrios dentro de grandes ciudades (Valencia, Alicante, Castellón):**
-- Mantener los 88 barrios de Valencia ciudad (datos actuales)
-- Buscar datos de barrios para Alicante y Castellón en sus portales open data
-- Zoom: al hacer clic en Valencia ciudad → ver barrios; al hacer clic en Xirivella → ver dato municipal
-
-**Nivel 3 (futuro) — Secciones censales:**
-- El ADRH tiene datos por sección censal (la unidad más pequeña, ~1500 personas)
-- Permitiría ver desigualdad DENTRO de cada municipio
-- Requiere GeoJSON de secciones censales (disponible en INE/Catastro)
-
-#### Plan de implementación
-
-**Paso 1: Descargar y explorar datasets nacionales**
-- [ ] Descargar ADRH del INE (CSV) filtrado para provincia de Valencia (46)
-- [ ] Descargar estadísticas catastrales titulares (persona jurídica por municipio)
-- [ ] Descargar GeoJSON municipios CV desde dadesobertes.gva.es
-- [ ] Explorar formato y campos disponibles de cada dataset
-
-**Paso 2: Diseñar schema multi-nivel**
-- [ ] Ampliar tabla `barrios` → `zonas` o añadir campo `tipo` (municipio/barrio/seccion_censal)
-- [ ] O crear tabla separada `municipios` con relación a barrios
-- [ ] Definir código INE como clave: municipio=5 dígitos, barrio=municipio+distrito+barrio
-
-**Paso 3: ETL municipios CV**
-- [ ] Cargar 542 municipios con geometría
-- [ ] Cruzar con ADRH: renta media, % pobreza, Gini
-- [ ] Cruzar con Catastro: % persona jurídica, nº inmuebles
-- [ ] Calcular IER municipal
-
-**Paso 4: Adaptar frontend multi-nivel**
-- [ ] Vista inicial: mapa de municipios de la CV
-- [ ] Zoom a Valencia ciudad: cambiar a vista de barrios (datos actuales)
-- [ ] Selector de nivel: municipio / barrio
-- [ ] Ajustar filtros y leyenda
-
-**Paso 5: Escalar a España (cuando CV esté completo)**
-- [ ] Mismos datasets nacionales, filtrar por provincia/CCAA
-- [ ] GeoJSON municipios de toda España (disponible en IGN)
-- [ ] Madrid barrios + municipios corona metropolitana
-- [ ] Barcelona barrios + municipios AMB
-
-#### Ventaja del enfoque nacional
-Una vez montado el pipeline con ADRH + Catastro + GeoJSON, escalar de la CV a toda España es simplemente cambiar el filtro de provincia. Los mismos datasets cubren los ~8.000 municipios de España.
-
----
-
-## Estado actual Fase 5: Comunidad Valenciana
-
-### Completado
-
-- [x] **GeoJSON municipios CV** — 542 municipios descargados (dadesobertes.gva.es)
-- [x] **ADRH Valencia (46)** — Tablas 31250 (renta), 31249 (demog), 31251 (fuentes), 31252/31255 (pobreza), 37721 (Gini) — 264 municipios
-- [x] **ADRH Alicante (03)** — Tablas 30833 (renta), 30834 (fuentes), 30838 (pobreza), 37733 (Gini) — 141 municipios
-- [x] **ADRH Castellón (12)** — Tablas 30962 (renta), 30961 (demog), 30963 (fuentes), 30967 (pobreza), 37691 (Gini) — 135 municipios
-- [x] **ETL municipios Valencia** — 263 municipios en DB con IER percentiles (rango 1.1–77.2)
-- [x] **Frontend selector** — "Provincia Valencia (municipios)" con zoom y año 2023 auto
-- [x] **Fórmula IER percentiles** — Distribución real: BAJO=19, MEDIO=148, ALTO=94, CRÍTICO=2
-
-### Pendiente
-
-- [ ] **ETL Alicante + Castellón** — Crear `etl_municipios_alicante.js` y `etl_municipios_castellon.js` (o ampliar `etl_municipios_cv.js` para las 3 provincias). CSVs ya descargados, solo falta cargar en DB y calcular IER.
-- [ ] **Frontend: opciones Alicante/Castellón** — Añadir al selector de ciudad, con centros de mapa y zoom adecuados.
-- [ ] **Frontend: vista "Comunidad Valenciana completa"** — Opción que muestre las 3 provincias juntas (542 municipios).
-- [ ] **Calibrar IER cross-provincia** — Cuando se junten las 3 provincias, recalcular percentiles sobre el conjunto completo para que sean comparables.
-- [ ] **Stats separadas** — Actualmente stats de `valencia_provincia` (year=2023) incluyen 350 registros (87 barrios + 263 municipios). Revisar si es necesario separar más limpiamente.
-- [ ] **Datos demográficos Alicante** — La tabla de demográficos de Alicante no se descargó (el offset -1 no coincidía). Probar tabla 30832.
-- [ ] **Limpiar scripts temporales** — `recalc_and_verify.js`, `debug_api.js`, múltiples `etl*.js`. Consolidar.
-
-### Mapa de tablas ADRH por provincia
-
-| Tipo | Valencia (46) | Alicante (03) | Castellón (12) |
-|------|:---:|:---:|:---:|
-| Renta media | 31250 | 30833 | 30962 |
-| Fuentes ingreso | 31251 | 30834 | 30963 |
-| Pobreza relativa | 31255 | 30838 | 30967 |
-| Demográficos | 31249 | pendiente | 30961 |
-| Gini | 37721 | 37733 | 37691 |
-
----
+| Variable | Dónde | Valor |
+|----------|-------|-------|
+| `VITE_API_URL` | Vercel | `https://alquilersano-backend-production.up.railway.app` |
+| `DATABASE_URL` | Railway | `postgresql+asyncpg://...@alquilersano-db.railway.internal:5432/railway` |
+| `ALLOWED_ORIGINS` | Railway | JSON array dominios Vercel |
 
 ## Licencia
 
