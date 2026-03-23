@@ -9,28 +9,21 @@ asyncpg==0.30.0
 psycopg2-binary==2.9.10
 alembic==1.14.0
 
-# ETL / Data
-pandas==2.2.3
-geopandas==1.0.1
+# HTTP client (for ETL python - optional)
 requests==2.32.3
 aiohttp==3.11.11
-openpyxl==3.1.5
-lxml==5.3.0
 
 # Config
 pydantic==2.10.4
 pydantic-settings==2.7.0
 python-dotenv==1.0.1
 
-# Auth JWT (Fase 7)
+# Auth JWT
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 
-# Rate limiting (Fase 7)
+# Rate limiting
 slowapi==0.1.9
-
-# ML — predicción de riesgo de desahucio (Fase 7)
-scikit-learn==1.6.1
 
 # Testing
 pytest==8.3.4
