@@ -342,6 +342,40 @@ Una vez montado el pipeline con ADRH + Catastro + GeoJSON, escalar de la CV a to
 
 ---
 
+## Estado actual Fase 5: Comunidad Valenciana
+
+### Completado
+
+- [x] **GeoJSON municipios CV** — 542 municipios descargados (dadesobertes.gva.es)
+- [x] **ADRH Valencia (46)** — Tablas 31250 (renta), 31249 (demog), 31251 (fuentes), 31252/31255 (pobreza), 37721 (Gini) — 264 municipios
+- [x] **ADRH Alicante (03)** — Tablas 30833 (renta), 30834 (fuentes), 30838 (pobreza), 37733 (Gini) — 141 municipios
+- [x] **ADRH Castellón (12)** — Tablas 30962 (renta), 30961 (demog), 30963 (fuentes), 30967 (pobreza), 37691 (Gini) — 135 municipios
+- [x] **ETL municipios Valencia** — 263 municipios en DB con IER percentiles (rango 1.1–77.2)
+- [x] **Frontend selector** — "Provincia Valencia (municipios)" con zoom y año 2023 auto
+- [x] **Fórmula IER percentiles** — Distribución real: BAJO=19, MEDIO=148, ALTO=94, CRÍTICO=2
+
+### Pendiente
+
+- [ ] **ETL Alicante + Castellón** — Crear `etl_municipios_alicante.js` y `etl_municipios_castellon.js` (o ampliar `etl_municipios_cv.js` para las 3 provincias). CSVs ya descargados, solo falta cargar en DB y calcular IER.
+- [ ] **Frontend: opciones Alicante/Castellón** — Añadir al selector de ciudad, con centros de mapa y zoom adecuados.
+- [ ] **Frontend: vista "Comunidad Valenciana completa"** — Opción que muestre las 3 provincias juntas (542 municipios).
+- [ ] **Calibrar IER cross-provincia** — Cuando se junten las 3 provincias, recalcular percentiles sobre el conjunto completo para que sean comparables.
+- [ ] **Stats separadas** — Actualmente stats de `valencia_provincia` (year=2023) incluyen 350 registros (87 barrios + 263 municipios). Revisar si es necesario separar más limpiamente.
+- [ ] **Datos demográficos Alicante** — La tabla de demográficos de Alicante no se descargó (el offset -1 no coincidía). Probar tabla 30832.
+- [ ] **Limpiar scripts temporales** — `recalc_and_verify.js`, `debug_api.js`, múltiples `etl*.js`. Consolidar.
+
+### Mapa de tablas ADRH por provincia
+
+| Tipo | Valencia (46) | Alicante (03) | Castellón (12) |
+|------|:---:|:---:|:---:|
+| Renta media | 31250 | 30833 | 30962 |
+| Fuentes ingreso | 31251 | 30834 | 30963 |
+| Pobreza relativa | 31255 | 30838 | 30967 |
+| Demográficos | 31249 | pendiente | 30961 |
+| Gini | 37721 | 37733 | 37691 |
+
+---
+
 ## Licencia
 
 MIT

@@ -73,19 +73,16 @@ Plataforma web que calcula el IER cruzando datos de gran tenedor (IBI), vulnerab
 - [ ] Cargar Barcelona
 - [ ] Desactivar opciones sin datos en selector ciudad
 
-### Fase 5: Escalar a toda la Comunidad Valenciana ⏳ (ver README.md para detalle)
+### Fase 5: Escalar a toda la Comunidad Valenciana (ver README.md para estado detallado)
 
-**Provincia Valencia (46): ✅ COMPLETADO**
-- 264 municipios cargados con geometría GeoJSON (dadesobertes.gva.es)
-- Datos ADRH del INE: renta, pobreza, Gini (tablas 31250, 31249, 31251, 31252, 31255, 37721)
-- IER calculado: rango 26.3-64.2, Top=Camporrobles, Bottom=Aielo de Rugat
-- Frontend: selector "Provincia Valencia (municipios)" con centro/zoom ajustado
-- Scripts: `download_all_nacional.js` + `etl_municipios_cv.js`
-- ciudad='valencia_provincia' en DB para distinguir de barrios
+**Valencia (46): ✅ COMPLETO** — 263 municipios con IER percentiles (1.1–77.2)
+**Alicante (03): ✅ DATOS DESCARGADOS** — 141 municipios. Falta: ETL + cargar en DB
+**Castellón (12): ✅ DATOS DESCARGADOS** — 135 municipios. Falta: ETL + cargar en DB
 
-**Provincias Alicante (03) y Castellón (12): pendiente**
-- Necesitan sus propias tablas ADRH del INE (IDs diferentes)
-- El GeoJSON ya tiene los 542 municipios de toda la CV
+Scripts: `download_all_nacional.js` (Valencia), `download_alicante_castellon.js` (Ali+Cas), `etl_municipios_cv.js` (carga Valencia)
+CSVs en: `data/raw/nacional/`
+
+**Próximo paso:** Crear ETL para Alicante y Castellón, añadir al selector del frontend.
 
 ### Mejoras técnicas (cuando haya hueco)
 
