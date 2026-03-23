@@ -17,6 +17,19 @@ from app.services.repositories import get_ier_historico, get_ier_scores
 
 router = APIRouter(prefix="/ier", tags=["ier"])
 
+_PRECISION = 4  # ~11m de precisión — suficiente para municipios en un mapa web
+
+
+def _round_coords(obj: object) -> object:
+    """Reduce precisión de coordenadas GeoJSON a 4 decimales para aligerar la respuesta."""
+    if isinstance(obj, float):
+        return round(obj, _PRECISION)
+    if isinstance(obj, list):
+        return [_round_coords(v) for v in obj]
+    if isinstance(obj, dict):
+        return {k: _round_coords(v) for k, v in obj.items()}
+    return obj
+
 
 @router.get("", response_model=list[BarrioGeoSchema])
 async def get_ier_mapa(
@@ -47,7 +60,7 @@ async def get_ier_mapa(
     for row in geom_result:
         if row.geojson:
             try:
-                geom_map[row.id] = json.loads(row.geojson)
+                geom_map[row.id] = _round_coords(json.loads(row.geojson))
             except Exception:
                 pass
 

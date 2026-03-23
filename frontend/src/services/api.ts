@@ -12,7 +12,11 @@ export const api = {
     max_ier?: number
     distrito?: string
     ciudad?: string
-  }) => client.get<BarrioConIER[]>('/api/v1/ier', { params }).then((r) => r.data),
+    signal?: AbortSignal
+  }) => {
+    const { signal, ...queryParams } = params
+    return client.get<BarrioConIER[]>('/api/v1/ier', { params: queryParams, signal }).then((r) => r.data)
+  },
 
   getBarrioDetalle: (id: number) =>
     client.get<BarrioDetalle>(`/api/v1/barrios/${id}`).then((r) => r.data),
