@@ -3,7 +3,7 @@ import type { BarrioConIER } from '../types'
 import { useBarrioDetalle } from '../hooks/useBarrioDetalle'
 import { ierToColor, ierToLabel, RIESGO_COLORS } from '../utils/ier'
 import IERHistoricoChart from './IERHistoricoChart'
-import ComponentesChart from './ComponentesChart'
+import ComponentesChart, { COMPONENTES_CONFIG } from './ComponentesChart'
 
 interface Props {
   barrio: BarrioConIER
@@ -97,6 +97,36 @@ export default function BarrioDetalleModal({ barrio, ierMedioCiudad, onClose }: 
                   <ComponentesChart score={ier} />
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Desglose componentes IER */}
+          {ier && (
+            <div style={{
+              background: 'var(--bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: '12px 16px',
+              fontSize: 13,
+            }}>
+              <strong>Desglose del IER ({ier.anyo})</strong>
+              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {COMPONENTES_CONFIG.map(({ key, label, max, color }) => {
+                  const val = ier[key] ?? 0
+                  const pct = Math.min(100, (val / max) * 100)
+                  return (
+                    <div key={key}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3, fontSize: 12 }}>
+                        <span style={{ color: 'var(--text-muted)' }}>{label}</span>
+                        <span style={{ fontWeight: 600 }}>{val.toFixed(1)} / {max}</span>
+                      </div>
+                      <div style={{ background: 'var(--border)', borderRadius: 4, height: 7, overflow: 'hidden' }}>
+                        <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 4, transition: 'width 0.4s ease' }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
 

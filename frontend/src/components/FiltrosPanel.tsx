@@ -20,11 +20,11 @@ const ANYO_DEFAULT: Record<string, number> = {
   barcelona: 2025,
 }
 
-const CIUDADES: { value: Ciudad; label: string }[] = [
+const CIUDADES: { value: Ciudad; label: string; disabled?: boolean }[] = [
   { value: 'valencia',           label: 'Valencia (barrios)' },
-  { value: 'valencia_provincia', label: 'Provincia Valencia (municipios)' },
-  { value: 'madrid',             label: 'Madrid' },
-  { value: 'barcelona',          label: 'Barcelona' },
+  { value: 'valencia_provincia', label: 'Comunidad Valenciana (municipios)' },
+  { value: 'madrid',             label: 'Madrid (Próximamente)',    disabled: true },
+  { value: 'barcelona',          label: 'Barcelona (Próximamente)', disabled: true },
 ]
 
 const DEFAULT_FILTROS: FiltrosMapaState = {
@@ -65,7 +65,7 @@ export default function FiltrosPanel({ filtros, onChange, distritos }: Props) {
             }}
           >
             {CIUDADES.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
+              <option key={c.value} value={c.value} disabled={c.disabled}>{c.label}</option>
             ))}
           </select>
         </div>
