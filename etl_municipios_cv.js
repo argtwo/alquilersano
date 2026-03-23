@@ -14,6 +14,59 @@ const { Client } = require('pg');
 const DIR = path.join(__dirname, 'data', 'raw', 'nacional');
 const DB_URL = 'postgresql://postgres:atNenxVddmELEHVeJyhMNdtDCTXjkfeJ@autorack.proxy.rlwy.net:49895/railway';
 
+// ═══════════════════════════════════════════════
+// UTM Zone 30N (EPSG:25830) → WGS84 (EPSG:4326) converter
+// The GVA GeoJSON uses UTM coordinates, Leaflet needs lat/lng
+// ═══════════════════════════════════════════════
+function utmToLatLng(easting, northing) {
+  const a = 6378137.0;
+  const f = 1 / 298.257223563;
+  const k0 = 0.9996;
+  const e = Math.sqrt(2 * f - f * f);
+  const e2 = e * e;
+  const ep2 = e2 / (1 - e2);
+  const zone = 30;
+  const lonOrigin = (zone - 1) * 6 - 180 + 3;
+
+  const x = easting - 500000;
+  const y = northing;
+
+  const M = y / k0;
+  const mu = M / (a * (1 - e2/4 - 3*e2*e2/64 - 5*e2*e2*e2/256));
+  const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+
+  const phi1 = mu + (3*e1/2 - 27*e1*e1*e1/32) * Math.sin(2*mu)
+    + (21*e1*e1/16 - 55*e1*e1*e1*e1/32) * Math.sin(4*mu)
+    + (151*e1*e1*e1/96) * Math.sin(6*mu);
+
+  const sinPhi = Math.sin(phi1);
+  const cosPhi = Math.cos(phi1);
+  const tanPhi = Math.tan(phi1);
+  const N1 = a / Math.sqrt(1 - e2 * sinPhi * sinPhi);
+  const T1 = tanPhi * tanPhi;
+  const C1 = ep2 * cosPhi * cosPhi;
+  const R1 = a * (1 - e2) / Math.pow(1 - e2 * sinPhi * sinPhi, 1.5);
+  const D = x / (N1 * k0);
+
+  const lat = phi1 - (N1 * tanPhi / R1) * (D*D/2 - (5 + 3*T1 + 10*C1 - 4*C1*C1 - 9*ep2)*D*D*D*D/24
+    + (61 + 90*T1 + 298*C1 + 45*T1*T1 - 252*ep2 - 3*C1*C1)*D*D*D*D*D*D/720);
+  const lon = (D - (1 + 2*T1 + C1)*D*D*D/6
+    + (5 - 2*C1 + 28*T1 - 3*C1*C1 + 8*ep2 + 24*T1*T1)*D*D*D*D*D/120) / cosPhi;
+
+  return [lonOrigin + lon * 180 / Math.PI, lat * 180 / Math.PI];
+}
+
+function convertGeometry(geom) {
+  if (!geom) return null;
+  function convertCoords(coords) {
+    if (typeof coords[0] === 'number') {
+      return utmToLatLng(coords[0], coords[1]);
+    }
+    return coords.map(convertCoords);
+  }
+  return { type: geom.type, coordinates: convertCoords(geom.coordinates) };
+}
+
 function parseCSV(filename) {
   const raw = fs.readFileSync(path.join(DIR, filename), 'utf8');
   const lines = raw.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
@@ -63,7 +116,9 @@ async function main() {
     const p = feat.properties;
     const codigoIne = p.MUNIINE; // 5-digit INE code like "46110"
     const nombre = p.NOMBRE;
-    const geom = feat.geometry ? JSON.stringify(feat.geometry) : null;
+    // Convert UTM (EPSG:25830) to WGS84 (EPSG:4326) for Leaflet
+    const geomWgs84 = feat.geometry ? convertGeometry(feat.geometry) : null;
+    const geom = geomWgs84 ? JSON.stringify(geomWgs84) : null;
 
     const r = await client.query(
       `INSERT INTO barrios (codigo_ine, nombre, nombre_val, distrito, distrito_num, ciudad, geometria)
