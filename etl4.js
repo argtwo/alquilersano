@@ -139,39 +139,51 @@ async function main() {
     console.log('Vuln headers:', vh.join(', '));
 
     // Primer paso: leer todos los valores para encontrar max (normalización)
+    // Fase 2: ahora cargamos los 4 índices (equip, dem, econom, global)
     const vulData = [];
-    let maxEconom = 0, maxGlobal = 0;
+    let maxEconom = 0, maxGlobal = 0, maxDem = 0, maxEquip = 0;
     for (const line of vl) {
       const row = rowObj(vh, line);
       const barriNom = resolveBarrio(row['nombre'] || '');
       if (!barriNom) continue;
       const indEconom = parseFloat((row['ind_econom'] || '').replace(',','.')) || 0;
       const indGlobal = parseFloat((row['ind_global'] || '').replace(',','.')) || 0;
-      if (!indEconom && !indGlobal) continue;
-      vulData.push({ barriNom, indEconom, indGlobal });
+      const indDem    = parseFloat((row['ind_dem']    || '').replace(',','.')) || 0;
+      const indEquip  = parseFloat((row['ind_equip']  || '').replace(',','.')) || 0;
+      if (!indEconom && !indGlobal && !indDem && !indEquip) continue;
+      vulData.push({ barriNom, indEconom, indGlobal, indDem, indEquip });
       if (indEconom > maxEconom) maxEconom = indEconom;
       if (indGlobal > maxGlobal) maxGlobal = indGlobal;
+      if (indDem    > maxDem)    maxDem    = indDem;
+      if (indEquip  > maxEquip)  maxEquip  = indEquip;
     }
-    console.log('Vuln max ind_econom:', maxEconom, '| max ind_global:', maxGlobal);
+    console.log('Vuln max ind_econom:', maxEconom, '| max ind_global:', maxGlobal, '| max ind_dem:', maxDem, '| max ind_equip:', maxEquip);
 
-    // Segundo paso: normalizar y guardar
-    // ind_econom e ind_global son índices compuestos 0-100
-    // Los normalizamos por su max para obtener un rango 0-1
-    // y los guardamos en tasa_pobreza y precariedad_laboral
+    // Segundo paso: normalizar y guardar los 4 índices de vulnerabilidad
+    // Mapeo de columnas (reutilizando columnas existentes sin nueva migración):
+    //   tasa_pobreza       → ind_econom normalizado (vulnerabilidad económica)
+    //   precariedad_laboral → ind_global normalizado (índice global compuesto)
+    //   pct_migrantes      → ind_dem normalizado    (vulnerabilidad demográfica) [Fase 2]
+    //   pct_desempleo      → ind_equip normalizado  (acceso a equipamientos)    [Fase 2]
     let vulOk = 0, vulFail = 0;
     const failedVul = new Set();
     for (const v of vulData) {
       const bid = barrioMap[v.barriNom];
       if (!bid) { failedVul.add(v.barriNom); vulFail++; continue; }
       const anyo = 2021;
-      // Normalizado 0-1 (para que el cálculo IER los escale correctamente)
-      const econNorm = maxEconom > 0 ? v.indEconom / maxEconom : 0;
-      const globNorm = maxGlobal > 0 ? v.indGlobal / maxGlobal : 0;
+      const econNorm  = maxEconom > 0 ? v.indEconom / maxEconom : 0;
+      const globNorm  = maxGlobal > 0 ? v.indGlobal / maxGlobal : 0;
+      const demNorm   = maxDem    > 0 ? v.indDem    / maxDem    : 0;
+      const equipNorm = maxEquip  > 0 ? v.indEquip  / maxEquip  : 0;
       await client.query(
         `INSERT INTO indicadores_exclusion (barrio_id, anyo, pct_migrantes, tasa_pobreza, precariedad_laboral, pct_desempleo)
-         VALUES ($1,$2,NULL,$3,$4,NULL)
-         ON CONFLICT (barrio_id, anyo) DO UPDATE SET tasa_pobreza=EXCLUDED.tasa_pobreza, precariedad_laboral=EXCLUDED.precariedad_laboral`,
-        [bid, anyo, econNorm, globNorm]
+         VALUES ($1,$2,$3,$4,$5,$6)
+         ON CONFLICT (barrio_id, anyo) DO UPDATE SET
+           tasa_pobreza=EXCLUDED.tasa_pobreza,
+           precariedad_laboral=EXCLUDED.precariedad_laboral,
+           pct_migrantes=EXCLUDED.pct_migrantes,
+           pct_desempleo=EXCLUDED.pct_desempleo`,
+        [bid, anyo, demNorm, econNorm, globNorm, equipNorm]
       );
       vulOk++;
     }
@@ -186,7 +198,8 @@ async function main() {
   const dataRes = await client.query(`
     SELECT b.id barrio_id, b.nombre,
       ibi.anyo, ibi.pct_persona_juridica, ibi.total_recibos,
-      exc.tasa_pobreza, exc.precariedad_laboral
+      exc.tasa_pobreza,        -- ind_econom normalizado (vulnerabilidad económica)
+      exc.pct_migrantes        -- ind_dem normalizado    (vulnerabilidad demográfica) [Fase 2]
     FROM barrios b
     JOIN recibos_ibi ibi ON ibi.barrio_id = b.id
     LEFT JOIN indicadores_exclusion exc ON exc.barrio_id = b.id
@@ -204,20 +217,19 @@ async function main() {
 
   let ierOk = 0;
   for (const row of rows) {
-    const pctJ = parseFloat(row.pct_persona_juridica) || 0;
-    // tasa_pobreza y precariedad_laboral ahora son valores 0-1 (normalizados)
-    const pobreza = parseFloat(row.tasa_pobreza) || 0;
-    const precariedad = parseFloat(row.precariedad_laboral) || 0;
+    const pctJ    = parseFloat(row.pct_persona_juridica) || 0;
+    const econNorm = parseFloat(row.tasa_pobreza)   || 0; // ind_econom normalizado 0-1
+    const demNorm  = parseFloat(row.pct_migrantes)  || 0; // ind_dem normalizado 0-1 [Fase 2]
 
-    // IER = 3 componentes que suman hasta 100
-    // compAlquiler: pct_persona_juridica normalizado → 0-50
+    // Fórmula IER Fase 2 (sin double-counting de índices de vulnerabilidad):
+    //   compAlquiler (0-50): presión inversora vía IBI — pct propietario persona jurídica
+    //   compEconom   (0-30): vulnerabilidad económica — ind_econom (desempleo, bajos ingresos)
+    //   compDem      (0-20): vulnerabilidad demográfica — ind_dem (dependencia, envejecimiento)
     const compAlquiler = (pctJ / pctMax) * 50;
-    // compPrecariedad: ind_econom normalizado (0-1) → 0-25
-    const compPrec = pobreza * 25;
-    // compSocial: ind_global normalizado (0-1) → 0-25
-    const compSocial = precariedad * 25;
+    const compEconom   = econNorm * 30;
+    const compDem      = demNorm  * 20;
 
-    const ier = Math.round((compAlquiler + compPrec + compSocial) * 10) / 10;
+    const ier = Math.round((compAlquiler + compEconom + compDem) * 10) / 10;
     const riesgo = ier >= 75 ? 'CRÍTICO' : ier >= 50 ? 'ALTO' : ier >= 25 ? 'MEDIO' : 'BAJO';
 
     await client.query(
@@ -227,7 +239,7 @@ async function main() {
          ier_value=EXCLUDED.ier_value, componente_alquiler=EXCLUDED.componente_alquiler,
          componente_precariedad=EXCLUDED.componente_precariedad, componente_salud_mental=EXCLUDED.componente_salud_mental,
          riesgo_desahucio=EXCLUDED.riesgo_desahucio`,
-      [row.barrio_id, row.anyo, ier, Math.round(compAlquiler*10)/10, Math.round(compPrec*10)/10, Math.round(compSocial*10)/10, ier, riesgo]
+      [row.barrio_id, row.anyo, ier, Math.round(compAlquiler*10)/10, Math.round(compEconom*10)/10, Math.round(compDem*10)/10, ier, riesgo]
     );
     ierOk++;
   }

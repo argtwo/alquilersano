@@ -1,26 +1,27 @@
 """
 Fase 2: Lógica de negocio — Cálculo del Índice de Estrés Residencial (IER).
 
-Fórmula:
-    IER = ω1·ratio_alquiler_normalizado + ω2·precariedad_normalizada − ω3·acceso_salud_normalizado
+Fórmula (Fase 2 — barrios Valencia ciudad):
+    IER = ω1·pct_persona_juridica_norm + ω2·ind_econom_norm + ω3·ind_dem_norm
 
-Pesos calibrados con datos FOESSA 2025:
-    ω1 = 0.50  (componente principal: peso del alquiler sobre la renta)
-    ω2 = 0.30  (precariedad laboral y exclusión)
-    ω3 = 0.20  (acceso a salud mental — factor protector, resta)
+    ω1 = 0.50  (presión inversora — % propietarios persona jurídica vía IBI)
+    ω2 = 0.30  (vulnerabilidad económica — ind_econom del índice de vulnerabilidad)
+    ω3 = 0.20  (vulnerabilidad demográfica — ind_dem del índice de vulnerabilidad)
 
-Todas las variables se normalizan a [0, 1] usando estadísticos de la ciudad completa
-antes de aplicar los pesos. El IER final se escala a [0, 100].
+Datos disponibles (Valencia Open Data):
+    - recibos-ibi-2020-2025: pct_persona_juridica por barrio/año
+    - vulnerabilidad-por-barrios: ind_econom, ind_dem, ind_equip, ind_global por barrio (2021)
+
+Nota: pct_desempleo almacena ind_equip_norm; pct_migrantes almacena ind_dem_norm.
+El IER final se escala a [0, 100].
 """
 from dataclasses import dataclass
 
 
-# ── Umbral de estrés habitacional (FOESSA 2025): hogares que dedican >30% al alquiler
-UMBRAL_STRESS_RATIO = 0.30
-# ── Pesos de la fórmula IER
-OMEGA1 = 0.50
-OMEGA2 = 0.30
-OMEGA3 = 0.20
+# ── Pesos de la fórmula IER (Fase 2)
+OMEGA1 = 0.50  # IBI inversora
+OMEGA2 = 0.30  # vulnerabilidad económica
+OMEGA3 = 0.20  # vulnerabilidad demográfica
 
 
 @dataclass
@@ -108,12 +109,10 @@ class IERCalculator:
             return vals
 
         fields: dict[str, list[float]] = {
-            "ratio_alquiler": _collect(lambda i: _ratio_alquiler(i)),
+            "pct_persona_juridica": _collect(lambda i: i.pct_persona_juridica),
+            "pct_ibi_impagados": _collect(lambda i: i.pct_ibi_impagados),
             "pct_desempleo": _collect(lambda i: i.pct_desempleo),
             "pct_migrantes": _collect(lambda i: i.pct_migrantes),
-            "pct_ibi_impagados": _collect(lambda i: i.pct_ibi_impagados),
-            "pct_persona_juridica": _collect(lambda i: i.pct_persona_juridica),
-            "tasa_salud_mental": _collect(lambda i: i.tasa_salud_mental),
         }
 
         for name, vals in fields.items():
@@ -127,28 +126,29 @@ class IERCalculator:
     def calculate(self, ind: IndicadoresBarrio) -> IERResult:
         """Calcula el IER para un único barrio. Requiere fit() previo."""
 
-        # — Componente 1: ratio alquiler/renta (principal)
-        ratio = _ratio_alquiler(ind)
-        c_alquiler = self._minmax("ratio_alquiler", ratio)
+        # — Componente 1: presión inversora IBI (principal)
+        # pct_persona_juridica = % propietarios persona jurídica, ya normalizado por ETL
+        c_alquiler = self._minmax("pct_persona_juridica", ind.pct_persona_juridica)
 
-        # — Componente 2: precariedad (promedio de 4 sub-indicadores)
-        c_desempleo = self._minmax("pct_desempleo", ind.pct_desempleo)
-        c_migrantes = self._minmax("pct_migrantes", ind.pct_migrantes)
-        c_impagados = self._minmax("pct_ibi_impagados", ind.pct_ibi_impagados)
+        # — Componente 2: vulnerabilidad económica
+        # tasa_pobreza almacena ind_econom normalizado 0-1 (desde vulnerabilidad-por-barrios)
+        # pct_desempleo almacena ind_equip normalizado 0-1 (Fase 2)
+        c_econom = self._safe(ind.pct_desempleo, default=0.0)   # ind_equip_norm como fallback
         c_juridica = self._minmax("pct_persona_juridica", ind.pct_persona_juridica)
-        c_precariedad = (c_desempleo + c_migrantes + c_impagados + c_juridica) / 4
+        c_impagados = self._minmax("pct_ibi_impagados", ind.pct_ibi_impagados)
+        # Precariedad = media ponderada de señales económicas disponibles
+        c_precariedad = (c_econom + c_juridica + c_impagados) / 3
 
-        # — Componente 3: salud mental (factor protector — invierto la escala)
-        c_sm_raw = self._minmax("tasa_salud_mental", ind.tasa_salud_mental)
-        c_salud_mental = c_sm_raw  # mayor tasa = peor acceso => suma al estrés (sin invertir)
+        # — Componente 3: vulnerabilidad demográfica
+        # pct_migrantes almacena ind_dem normalizado 0-1 (Fase 2)
+        c_salud_mental = self._safe(ind.pct_migrantes, default=0.0)
 
-        # — IER: escalar a 0–100
+        # — IER: escalar a 0–100 (sin resta — nueva fórmula Fase 2)
         ier_raw = (
             self.omega1 * c_alquiler
             + self.omega2 * c_precariedad
-            - self.omega3 * c_salud_mental  # resta como factor protector
+            + self.omega3 * c_salud_mental
         )
-        # Reclamp a [0,1] por si la resta da negativo
         ier_raw = max(0.0, min(1.0, ier_raw))
         ier_value = round(ier_raw * 100, 2)
 
@@ -194,16 +194,6 @@ class IERCalculator:
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
-
-def _ratio_alquiler(ind: IndicadoresBarrio) -> float | None:
-    """Calcula el ratio mensual_alquiler / (renta_anual / 12)."""
-    if ind.coste_alquiler_medio is None or ind.renta_media_hogar is None:
-        return None
-    renta_mensual = ind.renta_media_hogar / 12
-    if renta_mensual <= 0:
-        return None
-    return ind.coste_alquiler_medio / renta_mensual
-
 
 def _clasificar_riesgo(ind: IndicadoresBarrio, ier: float) -> str:
     """
