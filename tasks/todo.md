@@ -31,10 +31,11 @@
 - [ ] **3.6** Desactivar opciones Madrid/Barcelona (sin datos) o mostrar "Próximamente"
 
 ### Fase 2: Enriquecer datos barrios Valencia ciudad
-- [ ] **2.1** Cargar precio vivienda libre/m² (habitatge-lliure-preu-metre-quadrat)
-- [ ] **2.2** Cargar demografía por manzana → agregar por barrio
-- [ ] **2.3** Evaluar Recibos IAE por barrio
-- [ ] **2.5** Rediseñar fórmula IER barrios con datos reales
+- [x] **2.1** precio vivienda libre/m²: dataset `habitatge-lliure-preu-metre-quadrat` es solo nivel ciudad (sin barrio) → sustituido por uso completo de vulnerabilidad
+- [x] **2.2** Demografía: ind_dem (vulnerabilidad demográfica) añadido al ETL desde `vulnerabilidad-por-barrios` → guardado en pct_migrantes
+- [x] **2.3** IAE: dataset no existe en Valencia Open Data → descartado
+- [x] **2.5** Rediseñar fórmula IER barrios: 50% IBI + 30% ind_econom + 20% ind_dem (elimina double-counting ind_global)
+- [x] **2.bonus** Cargar también ind_equip normalizado → pct_desempleo (disponible para futuras fórmulas)
 
 ### Fase 4: Multi-ciudad
 - [ ] Cargar Madrid (barrios + municipios corona)
