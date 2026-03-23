@@ -78,9 +78,12 @@ export default function FiltrosPanel({ filtros, onChange, distritos }: Props) {
             value={filtros.anyo}
             onChange={(e) => onChange({ anyo: +e.target.value })}
           >
-            {(ANYO_OPTIONS[filtros.ciudad ?? 'valencia'] || ANYO_OPTIONS.valencia).map((y) => (
-              <option key={y} value={y}>{y}</option>
-            ))}
+            {(ANYO_OPTIONS[filtros.ciudad ?? 'valencia'] || ANYO_OPTIONS.valencia).map((y) => {
+              const esMejor = y === ANYO_DEFAULT[filtros.ciudad ?? 'valencia']
+              return (
+                <option key={y} value={y}>{y}{esMejor ? ' ★' : ''}</option>
+              )
+            })}
           </select>
         </div>
 

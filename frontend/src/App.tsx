@@ -51,7 +51,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <StatsBar stats={stats} anyo={filtros.anyo} />
+      <StatsBar stats={stats} anyo={filtros.anyo} ciudad={filtros.ciudad ?? 'valencia'} />
 
       <div className="app-body">
         <FiltrosPanel

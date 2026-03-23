@@ -1,16 +1,29 @@
 import type { CityStats } from '../types'
 import { RIESGO_COLORS } from '../utils/ier'
 
+// Total de barrios/municipios en DB por ciudad (incluyendo los sin datos ADRH)
+const TOTAL_GEOMETRIAS: Record<string, number> = {
+  valencia:           88,
+  valencia_provincia: 542,
+}
+
 interface Props {
   stats: CityStats | null
   anyo: number
+  ciudad?: string
 }
 
-export default function StatsBar({ stats, anyo }: Props) {
+export default function StatsBar({ stats, anyo, ciudad }: Props) {
+  const totalGeo = ciudad ? (TOTAL_GEOMETRIAS[ciudad] ?? null) : null
+  const cobertura = stats && totalGeo
+    ? `${stats.total_barrios}/${totalGeo}`
+    : stats?.total_barrios?.toString() ?? null
+  const etiquetaUnidad = ciudad === 'valencia_provincia' ? 'Municipios' : 'Barrios'
+
   return (
     <header className="app-header">
       <h1>AlquilerSano</h1>
-      <span className="tagline">Índice de Estrés Residencial por barrio · Valencia {anyo}</span>
+      <span className="tagline">Índice de Estrés Residencial · {anyo}</span>
 
       {stats && (
         <div className="stats-bar">
@@ -24,8 +37,8 @@ export default function StatsBar({ stats, anyo }: Props) {
           <div className="stat-divider" />
 
           <div className="stat-item">
-            <span className="stat-value">{stats.total_barrios}</span>
-            <span className="stat-label">Barrios</span>
+            <span className="stat-value">{cobertura}</span>
+            <span className="stat-label">{etiquetaUnidad} con datos</span>
           </div>
 
           <div className="stat-divider" />
