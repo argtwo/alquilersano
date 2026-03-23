@@ -8,7 +8,7 @@ interface Props {
 
 const ANYO_OPTIONS: Record<string, number[]> = {
   valencia:            [2021, 2022, 2023, 2024, 2025],
-  valencia_provincia:  [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
+  valencia_provincia:  [2020, 2021, 2022, 2023],
   madrid:              [2021, 2022, 2023, 2024, 2025],
   barcelona:           [2021, 2022, 2023, 2024, 2025],
 }
