@@ -5,9 +5,12 @@ import FiltrosPanel from './components/FiltrosPanel'
 import AlertasPanel from './components/AlertasPanel'
 import StatsBar from './components/StatsBar'
 import BarrioDetalleModal from './components/BarrioDetalleModal'
+import RankingView from './components/RankingView'
 import { useIERData } from './hooks/useIERData'
 import { useStats } from './hooks/useStats'
 import type { BarrioConIER, FiltrosMapaState } from './types'
+
+type Vista = 'mapa' | 'ranking'
 
 const DEFAULT_FILTROS: FiltrosMapaState = {
   anyo: 2025,
@@ -21,6 +24,7 @@ const DEFAULT_FILTROS: FiltrosMapaState = {
 export default function App() {
   const [filtros, setFiltros] = useState<FiltrosMapaState>(DEFAULT_FILTROS)
   const [barrioSeleccionado, setBarrioSeleccionado] = useState<BarrioConIER | null>(null)
+  const [vista, setVista] = useState<Vista>('mapa')
 
   const { data, loading, error } = useIERData(filtros)
   const stats = useStats(filtros.anyo, filtros.ciudad)
@@ -57,14 +61,38 @@ export default function App() {
         />
 
         <div className="map-wrapper">
+          <div className="vista-toggle">
+            <button
+              className={vista === 'mapa' ? 'vista-btn active' : 'vista-btn'}
+              onClick={() => setVista('mapa')}
+            >
+              🗺 Mapa
+            </button>
+            <button
+              className={vista === 'ranking' ? 'vista-btn active' : 'vista-btn'}
+              onClick={() => setVista('ranking')}
+            >
+              📊 Ranking
+            </button>
+          </div>
+
           {loading && <div className="map-loading">Cargando datos…</div>}
           {error && <div className="map-error">Error: {error}</div>}
-          <MapView
-            barrios={barrisosFiltrados}
-            onBarrioClick={handleBarrioClick}
-            anyo={filtros.anyo}
-            ciudad={filtros.ciudad ?? 'valencia'}
-          />
+
+          {vista === 'mapa' ? (
+            <MapView
+              barrios={barrisosFiltrados}
+              onBarrioClick={handleBarrioClick}
+              anyo={filtros.anyo}
+              ciudad={filtros.ciudad ?? 'valencia'}
+            />
+          ) : (
+            <RankingView
+              barrios={barrisosFiltrados}
+              anyo={filtros.anyo}
+              onBarrioClick={handleBarrioClick}
+            />
+          )}
         </div>
 
         <AlertasPanel

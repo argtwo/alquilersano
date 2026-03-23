@@ -421,3 +421,130 @@
 @media (max-width: 600px) {
   .charts-row { grid-template-columns: 1fr; }
 }
+
+/* ── Vista toggle (Mapa / Ranking) ───────────────────────────────────── */
+.vista-toggle {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+
+.vista-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background .15s, color .15s;
+}
+
+.vista-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ── Ranking view ────────────────────────────────────────────────────── */
+.ranking-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-panel);
+}
+
+.ranking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.ranking-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.ranking-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.ranking-table-wrapper {
+  flex: 1;
+  overflow: auto;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ranking-table thead {
+  position: sticky;
+  top: 0;
+  background: var(--bg-panel);
+  z-index: 1;
+}
+
+.ranking-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+}
+
+.ranking-row {
+  cursor: pointer;
+  transition: background .1s;
+}
+
+.ranking-row:hover {
+  background: var(--bg);
+}
+
+.ranking-row td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.ranking-pos {
+  color: var(--text-muted);
+  font-size: 11px;
+  width: 36px;
+}
+
+.ranking-nombre {
+  font-weight: 600;
+}
+
+.ranking-distrito {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.riesgo-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}

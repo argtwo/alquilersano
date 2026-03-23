@@ -12,21 +12,18 @@ interface Props {
   score: IERScore
 }
 
+// Componentes IER Fase 2: valores en escala real (0-50 / 0-30 / 0-20)
+export const COMPONENTES_CONFIG = [
+  { key: 'componente_alquiler',    label: 'Presión inversora',      max: 50, color: '#ef4444' },
+  { key: 'componente_precariedad', label: 'Vulnerabilidad económica', max: 30, color: '#f97316' },
+  { key: 'componente_salud_mental',label: 'Vulnerabilidad demográfica', max: 20, color: '#eab308' },
+] as const
+
 export default function ComponentesChart({ score }: Props) {
-  const data = [
-    {
-      componente: 'Alquiler/Renta',
-      valor: +(score.componente_alquiler * 100).toFixed(1),
-    },
-    {
-      componente: 'Precariedad',
-      valor: +(score.componente_precariedad * 100).toFixed(1),
-    },
-    {
-      componente: 'Salud Mental',
-      valor: +(score.componente_salud_mental * 100).toFixed(1),
-    },
-  ]
+  const data = COMPONENTES_CONFIG.map(({ key, label }) => ({
+    componente: label,
+    valor: +(score[key] ?? 0),
+  }))
 
   return (
     <ResponsiveContainer width="100%" height={180}>
