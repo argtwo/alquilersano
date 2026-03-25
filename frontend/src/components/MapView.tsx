@@ -137,7 +137,11 @@ export default function MapView({ barrios, onBarrioClick, anyo, ciudad = 'valenc
       <MapContainer center={center} zoom={zoom} style={{ height: '100%', width: '100%' }} zoomControl={false}>
         <TileLayer
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+        />
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png"
+          pane="shadowPane"
         />
         <RecenterMap ciudad={ciudad} />
         {/* key incluye ciudad y año para refrescar la capa GeoJSON */}
