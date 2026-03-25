@@ -1,8 +1,20 @@
 # AlquilerSano — Índice de Estrés Habitacional
 
-Plataforma web que calcula el **Índice de Estrés Residencial (IER)** por municipio y barrio, cruzando datos de renta (ADRH/INE), pobreza, desigualdad (Gini) y vulnerabilidad. Visualiza un mapa de calor interactivo de la Comunidad Valenciana.
+Plataforma web que calcula el **Índice de Estrés Residencial (IER)** por municipio y barrio, cruzando datos de renta, pobreza y desigualdad del INE. Dashboard dark con mapa interactivo de la Comunidad Valenciana.
 
 > El 20% de hogares con bajos ingresos en España destina más del 70% de su renta al alquiler (FOESSA 2025).
+
+## 🖥️ Dashboard
+
+![AlquilerSano Dashboard](docs/screenshot.png)
+
+Dark command center con:
+- **Popup de bienvenida** explicando el estrés residencial y cómo leer el mapa
+- **KPI cards** de distribución por riesgo (Bajo/Medio/Alto/Crítico)
+- **Mapa dark** (CartoDB) con municipios coloreados por IER
+- **Panel de filtros** (zona, año, rango IER, riesgo)
+- **Panel de alertas** con municipios en riesgo alto/crítico
+- **Vista ranking** (tabla ordenable)
 
 ## 🌐 Links
 
@@ -10,65 +22,51 @@ Plataforma web que calcula el **Índice de Estrés Residencial (IER)** por munic
 |----------|-----|
 | **Frontend** | https://frontend-gamma-khaki-78.vercel.app |
 | **Backend API** | https://alquilersano-backend-production.up.railway.app |
-| **API Docs** | https://alquilersano-backend-production.up.railway.app/docs |
 | **GitHub** | https://github.com/argtwo/alquilersano |
 
-## Datos cargados (23 marzo 2026)
+## Datos cargados
 
 | Ámbito | Fuente | Registros | IER |
 |--------|--------|-----------|-----|
-| **Valencia barrios** | Open Data Valencia (IBI + vulnerabilidad) | 87 barrios × 5 años | ✅ 3.0–82.8 |
-| **CV municipios** | ADRH/INE (renta + pobreza + Gini) | 534 municipios × 9 años | ✅ 0.2–94.3 |
+| **CV municipios** | ADRH/INE (renta + pobreza + Gini) | 534 municipios × 9 años | 0.2–94.3 |
+| **Valencia barrios** | Open Data Valencia (IBI + vulnerabilidad) | 87 barrios × 5 años | 3.0–82.8 |
 | Madrid / Barcelona | Pendiente | — | ⏳ |
 
 ### Distribución IER municipios CV (2023)
-- **BAJO** (0–24): 67 municipios
-- **MEDIO** (25–49): 291 municipios
-- **ALTO** (50–74): 169 municipios
-- **CRÍTICO** (75–100): 7 municipios
+BAJO 67 · MEDIO 291 · ALTO 169 · CRÍTICO 7
 
 ## Stack
 
 | Capa | Tecnologías |
 |------|-------------|
-| Frontend | React 18 + TypeScript + Vite, Leaflet, Recharts |
+| Frontend | React 18 + TypeScript + Vite, Leaflet (CartoDB dark tiles), DM Sans |
 | Backend | FastAPI + Python 3.12, SQLAlchemy async, Alembic |
-| DB | PostgreSQL 16 (Railway) — sin PostGIS, geometría como GeoJSON TEXT |
+| DB | PostgreSQL 16 (Railway) — sin PostGIS |
 | ETL | Node.js (descarga INE + carga DB) |
 | Despliegue | Vercel (frontend) · Railway (backend + PostgreSQL) |
 
 ## Fórmula IER
 
-**Municipios CV** (basado en ADRH del INE, percentiles):
+**Municipios** (percentiles ADRH/INE):
 ```
-IER = compRenta(0–40) + compPobreza(0–35) + compGini(0–25) = 0–100
+IER = (1 - pctRenta) × 40 + pctPobreza × 35 + pctGini × 25
 ```
-- compRenta: percentil inverso de renta neta por hogar (menor renta = más estrés)
-- compPobreza: percentil de % población bajo 60% mediana
-- compGini: percentil del índice de Gini
 
-**Barrios Valencia** (basado en IBI + vulnerabilidad Open Data):
+**Barrios Valencia** (IBI + vulnerabilidad):
 ```
-IER = compAlquiler(0–50) + compPrecariedad(0–25) + compSocial(0–25)
+IER = pctJuridica × 50 + econom × 25 + global × 25
 ```
 
 ## Scripts ETL
 
 ```bash
-# Barrios Valencia ciudad (IBI + vulnerabilidad)
-node etl4.js
-
-# Municipios CV completa (ADRH INE — 3 provincias)
-node etl_municipios_cv.js
-
-# Descargar datos INE
-node --max-old-space-size=4096 download_all_nacional.js          # Valencia
-node --max-old-space-size=4096 download_alicante_castellon.js    # Alicante + Castellón
+node etl4.js                                          # Barrios Valencia
+node etl_municipios_cv.js                             # 542 municipios CV
+node --max-old-space-size=4096 download_all_nacional.js          # INE Valencia
+node --max-old-space-size=4096 download_alicante_castellon.js    # INE Ali+Cas
 ```
 
-## Tablas ADRH del INE por provincia
-
-El INE organiza el ADRH en tablas separadas por provincia. IDs confirmados:
+## Tablas ADRH del INE
 
 | Provincia | Renta | Pobreza | Gini | Municipios |
 |-----------|-------|---------|------|------------|
@@ -81,21 +79,12 @@ El INE organiza el ADRH en tablas separadas por provincia. IDs confirmados:
 ```bash
 # Backend
 cd backend && pip install -r requirements.txt
-DATABASE_URL=postgresql+asyncpg://... uvicorn app.main:app --reload --port 8000
+DATABASE_URL=postgresql+asyncpg://... uvicorn app.main:app --reload
 
 # Frontend
 cd frontend && npm install
 echo "VITE_API_URL=http://localhost:8000" > .env && npm run dev
 ```
 
-## Variables de entorno
-
-| Variable | Dónde | Valor |
-|----------|-------|-------|
-| `VITE_API_URL` | Vercel | `https://alquilersano-backend-production.up.railway.app` |
-| `DATABASE_URL` | Railway | `postgresql+asyncpg://...@alquilersano-db.railway.internal:5432/railway` |
-| `ALLOWED_ORIGINS` | Railway | JSON array dominios Vercel |
-
 ## Licencia
-
 MIT

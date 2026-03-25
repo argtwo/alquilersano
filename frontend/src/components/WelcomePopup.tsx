@@ -9,27 +9,29 @@ export default function WelcomePopup({ onClose }: Props) {
         <div className="welcome-hero">
           <div className="welcome-icon">🏠</div>
           <h2>Bienvenido a AlquilerSano</h2>
-          <p>Atlas del estrés habitacional en la Comunidad Valenciana</p>
+          <p>Atlas interactivo del estrés habitacional en España</p>
         </div>
 
         <div className="welcome-body">
           <div className="welcome-section">
             <h3>¿Qué es el estrés residencial?</h3>
             <p>
-              El estrés residencial mide la presión económica que sufren las familias para mantener su vivienda.
-              Cuando una familia destina gran parte de sus ingresos al alquiler, le queda poco para alimentación,
-              salud o educación. En España, el 20% de los hogares con menores ingresos gasta más del 70% de su
-              renta en vivienda. Esto genera ansiedad, precariedad y riesgo de desahucio.
+              El estrés residencial mide la presión económica que sufren las familias para mantener 
+              su vivienda. Cuando una familia destina gran parte de sus ingresos al alquiler, le queda 
+              poco para alimentación, salud o educación. En España, el 20% de los hogares con menores 
+              ingresos gasta más del 70% de su renta en vivienda. Esto genera ansiedad, precariedad 
+              y riesgo de desahucio.
             </p>
           </div>
 
           <div className="welcome-section">
             <h3>¿Qué muestra este mapa?</h3>
             <p>
-              Cada zona del mapa es un municipio de la Comunidad Valenciana. El color indica su
-              <strong> Índice de Estrés Residencial (IER)</strong>, que combina tres datos oficiales del
-              Instituto Nacional de Estadística: la renta de los hogares, la tasa de pobreza y la desigualdad
-              económica (índice de Gini).
+              Cada zona coloreada representa un municipio o barrio. El color indica su
+              <strong> Índice de Estrés Residencial (IER)</strong>, calculado a partir de datos 
+              oficiales del Instituto Nacional de Estadística: nivel de renta de los hogares, 
+              tasa de pobreza y desigualdad económica (índice de Gini). Puedes cambiar de zona 
+              geográfica y año en los filtros del panel izquierdo.
             </p>
           </div>
 
@@ -54,8 +56,8 @@ export default function WelcomePopup({ onClose }: Props) {
               </div>
             </div>
             <p style={{ marginTop: 8 }}>
-              Cuanto más cálido el color, mayor es la dificultad de las familias para llegar a fin de mes
-              después de pagar el alquiler.
+              Cuanto más cálido el color, mayor es la dificultad de las familias para 
+              llegar a fin de mes después de pagar la vivienda.
             </p>
           </div>
 

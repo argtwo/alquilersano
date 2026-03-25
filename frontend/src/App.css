@@ -315,7 +315,7 @@
 .dark-tooltip::before { display: none; }
 
 /* ── Leaflet dark controls ───────────────────────────────────────────── */
-.leaflet-container { background: var(--bg-app) !important; }
+.leaflet-container { background: #0d1520 !important; }
 .leaflet-control-attribution {
   background: var(--bg-card) !important;
   color: var(--text-dim) !important;
