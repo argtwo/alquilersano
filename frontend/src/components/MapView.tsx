@@ -85,30 +85,30 @@ function CapaBarrios({ barrios, onBarrioClick }: CapaProps) {
             data={barrio.geometria as GeoJSON.GeoJsonObject}
             style={{
               fillColor: ier != null ? ierToColor(ier) : '#94a3b8',
-              fillOpacity: 0.65,
-              weight: 1,
-              color: '#fff',
-              opacity: 0.8,
+              fillOpacity: 0.7,
+              weight: 0.8,
+              color: '#1e293b',
+              opacity: 0.9,
             }}
             ref={(ref) => {
               if (ref) layerRefs.current.set(barrio.id, ref)
             }}
             onEachFeature={(_feature, layer: Layer) => {
               const tooltip =
-                `<div style="font-family:system-ui;font-size:13px;min-width:140px">` +
-                `<strong style="display:block;margin-bottom:4px">${barrio.nombre}</strong>` +
+                `<div style="font-family:system-ui;font-size:13px;min-width:140px;background:#1a2235;color:#e2e8f0;padding:8px 10px;border-radius:6px;border:1px solid #334155">` +
+                `<strong style="display:block;margin-bottom:4px;color:#f8fafc">${barrio.nombre}</strong>` +
                 (ier != null
                   ? `<span>IER: <strong style="color:${ierToColor(ier)}">${ier.toFixed(1)}</strong> · ${ierToLabel(ier)}</span><br/>` +
-                    `<span style="font-size:11px;color:#64748b">Riesgo: <span style="color:${RIESGO_COLORS[riesgo!]};font-weight:600">${riesgo}</span></span>`
-                  : `<span style="color:#94a3b8">Sin datos</span>`) +
+                    `<span style="font-size:11px;color:#94a3b8">Riesgo: <span style="color:${RIESGO_COLORS[riesgo!]};font-weight:600">${riesgo}</span></span>`
+                  : `<span style="color:#64748b">Sin datos</span>`) +
                 `</div>`
-              layer.bindTooltip(tooltip, { sticky: true, opacity: 0.97 })
+              layer.bindTooltip(tooltip, { sticky: true, opacity: 1, className: 'dark-tooltip' })
               layer.on('click', () => onBarrioClick(barrio))
               layer.on('mouseover', function (this: Layer & { setStyle?: (s: object) => void }) {
-                this.setStyle?.({ weight: 2, color: '#1e293b', fillOpacity: 0.8 })
+                this.setStyle?.({ weight: 2, color: '#22c55e', fillOpacity: 0.85 })
               })
               layer.on('mouseout', function (this: Layer & { setStyle?: (s: object) => void }) {
-                this.setStyle?.({ weight: 1, color: '#fff', fillOpacity: 0.65 })
+                this.setStyle?.({ weight: 0.8, color: '#1e293b', fillOpacity: 0.7 })
               })
             }}
           />
@@ -136,8 +136,8 @@ export default function MapView({ barrios, onBarrioClick, anyo, ciudad = 'valenc
     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
       <MapContainer center={center} zoom={zoom} style={{ height: '100%', width: '100%' }} zoomControl={false}>
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
         <RecenterMap ciudad={ciudad} />
         {/* key incluye ciudad y año para refrescar la capa GeoJSON */}

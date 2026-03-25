@@ -1,0 +1,18 @@
+{
+  "agents": {
+    "agent-1774292888399-zjmmtt": {
+      "agentId": "agent-1774292888399-zjmmtt",
+      "agentType": "coder",
+      "status": "idle",
+      "health": 1,
+      "taskCount": 0,
+      "config": {
+        "provider": "anthropic"
+      },
+      "createdAt": "2026-03-23T19:08:08.399Z",
+      "model": "sonnet",
+      "modelRoutedBy": "default"
+    }
+  },
+  "version": "3.0.0"
+}

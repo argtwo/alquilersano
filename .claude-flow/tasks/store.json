@@ -1,0 +1,33 @@
+{
+  "tasks": {
+    "task-1774292564061-orivlw": {
+      "taskId": "task-1774292564061-orivlw",
+      "type": "refactoring",
+      "description": "rehacer el frontend, botones e interfaz para darle un acabado pulido y profesional",
+      "priority": "normal",
+      "status": "pending",
+      "progress": 0,
+      "assignedTo": [],
+      "tags": [],
+      "createdAt": "2026-03-23T19:02:44.061Z",
+      "startedAt": null,
+      "completedAt": null
+    },
+    "task-1774293042490-qwpg62": {
+      "taskId": "task-1774293042490-qwpg62",
+      "type": "refactoring",
+      "description": "refactoriza el frontend y rediseña la UI para que sea moderna, profesional y consistente",
+      "priority": "normal",
+      "status": "in_progress",
+      "progress": 0,
+      "assignedTo": [
+        "coder-1"
+      ],
+      "tags": [],
+      "createdAt": "2026-03-23T19:10:42.490Z",
+      "startedAt": "2026-03-23T19:15:48.907Z",
+      "completedAt": null
+    }
+  },
+  "version": "3.0.0"
+}
