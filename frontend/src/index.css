@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Merriweather:wght@700&display=swap');
+
 /* ── AlquilerSano Dark Dashboard ─────────────────────────────────────── */
 :root {
   --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
@@ -33,7 +35,36 @@
   --shadow-lg: 0 12px 32px rgba(0,0,0,.5);
 }
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+/* ── Light theme ──────────────────────────────────────────────────────── */
+:root[data-theme="light"] {
+  --bg-app: #f5f0eb;
+  --bg-surface: #faf7f2;
+  --bg-card: #ede8e1;
+  --bg-hover: #e5ded5;
+  --bg-input: #f0ebe4;
+
+  --border: #d6cfc7;
+  --border-hover: #c4bbb1;
+
+  --text: #292524;
+  --text-muted: #78716c;
+  --text-dim: #a8a29e;
+  --text-bright: #1c1917;
+
+  --accent: #0f766e;
+  --accent-hover: #0d6460;
+  --accent-dim: rgba(15, 118, 110, 0.12);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.12);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,.15);
+}
+
+/* Serif en títulos solo en tema light */
+:root[data-theme="light"] .app-header h1,
+:root[data-theme="light"] .welcome-hero h2 {
+  font-family: 'Merriweather', Georgia, serif;
+}
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

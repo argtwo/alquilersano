@@ -24,6 +24,7 @@ interface Props {
   onBarrioClick: (barrio: BarrioConIER) => void
   anyo: number
   ciudad?: Ciudad
+  theme?: 'dark' | 'light'
 }
 
 // ── Leyenda superpuesta ──────────────────────────────────────────────────────
@@ -51,10 +52,22 @@ function MapLeyenda() {
 interface CapaProps {
   barrios: BarrioConIER[]
   onBarrioClick: (b: BarrioConIER) => void
+  theme: 'dark' | 'light'
 }
 
-function CapaBarrios({ barrios, onBarrioClick }: CapaProps) {
+function CapaBarrios({ barrios, onBarrioClick, theme }: CapaProps) {
   const layerRefs = useRef<Map<number, LeafletGeoJSON>>(new Map())
+
+  const borderColor = theme === 'light' ? '#ffffff' : '#1e293b'
+  const hoverColor  = theme === 'light' ? '#0f766e' : '#22c55e'
+  const fillOpacity = theme === 'light' ? 0.75 : 0.7
+
+  const tooltipBg     = theme === 'light' ? '#faf7f2' : '#1a2235'
+  const tooltipText   = theme === 'light' ? '#292524' : '#e2e8f0'
+  const tooltipBorder = theme === 'light' ? '#d6cfc7' : '#334155'
+  const tooltipTitle  = theme === 'light' ? '#1c1917' : '#f8fafc'
+  const tooltipMuted  = theme === 'light' ? '#78716c' : '#94a3b8'
+  const tooltipNoData = theme === 'light' ? '#a8a29e' : '#64748b'
 
   // Actualiza estilos si cambia el IER sin desmontar la capa
   useEffect(() => {
@@ -63,14 +76,14 @@ function CapaBarrios({ barrios, onBarrioClick }: CapaProps) {
       if (layer) {
         layer.setStyle({
           fillColor: b.ier ? ierToColor(b.ier.ier_value) : '#94a3b8',
-          fillOpacity: 0.65,
+          fillOpacity,
           weight: 1,
-          color: '#fff',
+          color: borderColor,
           opacity: 0.8,
         })
       }
     })
-  }, [barrios])
+  }, [barrios, borderColor, fillOpacity])
 
   return (
     <>
@@ -79,36 +92,37 @@ function CapaBarrios({ barrios, onBarrioClick }: CapaProps) {
         const ier = barrio.ier?.ier_value
         const riesgo = barrio.ier?.riesgo_desahucio
 
+        const tooltip =
+          `<div style="font-family:system-ui;font-size:13px;min-width:140px;background:${tooltipBg};color:${tooltipText};padding:8px 10px;border-radius:6px;border:1px solid ${tooltipBorder}">` +
+          `<strong style="display:block;margin-bottom:4px;color:${tooltipTitle}">${barrio.nombre}</strong>` +
+          (ier != null
+            ? `<span>IER: <strong style="color:${ierToColor(ier)}">${ier.toFixed(1)}</strong> · ${ierToLabel(ier)}</span><br/>` +
+              `<span style="font-size:11px;color:${tooltipMuted}">Riesgo: <span style="color:${RIESGO_COLORS[riesgo!]};font-weight:600">${riesgo}</span></span>`
+            : `<span style="color:${tooltipNoData}">Sin datos</span>`) +
+          `</div>`
+
         return (
           <GeoJSON
             key={barrio.id}
             data={barrio.geometria as GeoJSON.GeoJsonObject}
             style={{
               fillColor: ier != null ? ierToColor(ier) : '#94a3b8',
-              fillOpacity: 0.7,
+              fillOpacity,
               weight: 0.8,
-              color: '#1e293b',
+              color: borderColor,
               opacity: 0.9,
             }}
             ref={(ref) => {
               if (ref) layerRefs.current.set(barrio.id, ref)
             }}
             onEachFeature={(_feature, layer: Layer) => {
-              const tooltip =
-                `<div style="font-family:system-ui;font-size:13px;min-width:140px;background:#1a2235;color:#e2e8f0;padding:8px 10px;border-radius:6px;border:1px solid #334155">` +
-                `<strong style="display:block;margin-bottom:4px;color:#f8fafc">${barrio.nombre}</strong>` +
-                (ier != null
-                  ? `<span>IER: <strong style="color:${ierToColor(ier)}">${ier.toFixed(1)}</strong> · ${ierToLabel(ier)}</span><br/>` +
-                    `<span style="font-size:11px;color:#94a3b8">Riesgo: <span style="color:${RIESGO_COLORS[riesgo!]};font-weight:600">${riesgo}</span></span>`
-                  : `<span style="color:#64748b">Sin datos</span>`) +
-                `</div>`
               layer.bindTooltip(tooltip, { sticky: true, opacity: 1, className: 'dark-tooltip' })
               layer.on('click', () => onBarrioClick(barrio))
               layer.on('mouseover', function (this: Layer & { setStyle?: (s: object) => void }) {
-                this.setStyle?.({ weight: 2, color: '#22c55e', fillOpacity: 0.85 })
+                this.setStyle?.({ weight: 2, color: hoverColor, fillOpacity: 0.88 })
               })
               layer.on('mouseout', function (this: Layer & { setStyle?: (s: object) => void }) {
-                this.setStyle?.({ weight: 0.8, color: '#1e293b', fillOpacity: 0.7 })
+                this.setStyle?.({ weight: 0.8, color: borderColor, fillOpacity })
               })
             }}
           />
@@ -128,24 +142,33 @@ function RecenterMap({ ciudad }: { ciudad: Ciudad }) {
 }
 
 // ── Componente principal ─────────────────────────────────────────────────────
-export default function MapView({ barrios, onBarrioClick, anyo, ciudad = 'valencia' }: Props) {
+export default function MapView({ barrios, onBarrioClick, anyo, ciudad = 'valencia', theme = 'dark' }: Props) {
   const center = CIUDAD_CENTER[ciudad]
   const zoom = CIUDAD_ZOOM[ciudad]
+
+  const tileBase   = theme === 'light'
+    ? 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
+  const tileLabels = theme === 'light'
+    ? 'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png'
 
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
       <MapContainer center={center} zoom={zoom} style={{ height: '100%', width: '100%' }} zoomControl={false}>
         <TileLayer
+          key={`base-${theme}`}
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          url={tileBase}
         />
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png"
+          key={`labels-${theme}`}
+          url={tileLabels}
           pane="shadowPane"
         />
         <RecenterMap ciudad={ciudad} />
-        {/* key incluye ciudad y año para refrescar la capa GeoJSON */}
-        <CapaBarrios key={`${ciudad}-${anyo}`} barrios={barrios} onBarrioClick={onBarrioClick} />
+        {/* key incluye ciudad, año y tema para refrescar la capa GeoJSON */}
+        <CapaBarrios key={`${ciudad}-${anyo}-${theme}`} barrios={barrios} onBarrioClick={onBarrioClick} theme={theme} />
       </MapContainer>
       <MapLeyenda />
     </div>
