@@ -11,9 +11,11 @@ interface Props {
   stats: CityStats | null
   anyo: number
   ciudad?: string
+  theme?: 'dark' | 'light'
+  onThemeToggle?: () => void
 }
 
-export default function StatsBar({ stats, anyo, ciudad }: Props) {
+export default function StatsBar({ stats, anyo, ciudad, theme, onThemeToggle }: Props) {
   const totalGeo = ciudad ? (TOTAL_GEOMETRIAS[ciudad] ?? null) : null
   const cobertura = stats && totalGeo
     ? `${stats.total_barrios}/${totalGeo}`
@@ -24,6 +26,11 @@ export default function StatsBar({ stats, anyo, ciudad }: Props) {
     <header className="app-header">
       <h1>AlquilerSano</h1>
       <span className="tagline">Índice de Estrés Residencial · {anyo}</span>
+      {onThemeToggle && (
+        <button className="theme-toggle" onClick={onThemeToggle} title="Cambiar tema">
+          {theme === 'dark' ? '☀' : '☾'}
+        </button>
+      )}
 
       {stats && (
         <div className="stats-bar">

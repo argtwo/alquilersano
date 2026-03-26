@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import MapView from './components/MapView'
 import FiltrosPanel from './components/FiltrosPanel'
@@ -28,6 +28,19 @@ export default function App() {
   const [barrioSeleccionado, setBarrioSeleccionado] = useState<BarrioConIER | null>(null)
   const [vista, setVista] = useState<Vista>('mapa')
   const [showWelcome, setShowWelcome] = useState(true)
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('theme') as 'dark' | 'light' | null
+    const initial = saved ?? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+    document.documentElement.setAttribute('data-theme', initial)
+    return initial
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   const { data, loading, error } = useIERData(filtros)
   const stats = useStats(filtros.anyo, filtros.ciudad)
@@ -49,7 +62,7 @@ export default function App() {
     <div className="app">
       {showWelcome && <WelcomePopup onClose={() => setShowWelcome(false)} />}
 
-      <StatsBar stats={stats} anyo={filtros.anyo} ciudad={filtros.ciudad ?? 'valencia'} />
+      <StatsBar stats={stats} anyo={filtros.anyo} ciudad={filtros.ciudad ?? 'valencia'} theme={theme} onThemeToggle={toggleTheme} />
       <KPIRow stats={stats} />
 
       <div className="app-body">
@@ -69,7 +82,7 @@ export default function App() {
           {error && <div className="map-error">Error: {error}</div>}
 
           {vista === 'mapa' ? (
-            <MapView barrios={barrisosFiltrados} onBarrioClick={handleBarrioClick} anyo={filtros.anyo} ciudad={filtros.ciudad ?? 'valencia'} />
+            <MapView barrios={barrisosFiltrados} onBarrioClick={handleBarrioClick} anyo={filtros.anyo} ciudad={filtros.ciudad ?? 'valencia'} theme={theme} />
           ) : (
             <RankingView barrios={barrisosFiltrados} anyo={filtros.anyo} onBarrioClick={handleBarrioClick} />
           )}

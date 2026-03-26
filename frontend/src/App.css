@@ -314,8 +314,22 @@
 .dark-tooltip .leaflet-tooltip-content { padding: 0; }
 .dark-tooltip::before { display: none; }
 
+/* ── Theme toggle button ─────────────────────────────────────────────── */
+.theme-toggle {
+  margin-left: auto;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: var(--radius);
+}
+.theme-toggle:hover { background: var(--bg-hover); border-color: var(--border-hover); }
+
 /* ── Leaflet dark controls ───────────────────────────────────────────── */
 .leaflet-container { background: #0d1520 !important; }
+:root[data-theme="light"] .leaflet-container { background: #e8e3dc !important; }
 .leaflet-control-attribution {
   background: var(--bg-card) !important;
   color: var(--text-dim) !important;
