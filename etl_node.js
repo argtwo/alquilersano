@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * ETL Valencia completo en Node.js puro
  * Descarga barrios + indicadores y los inserta en Railway PostgreSQL
@@ -7,7 +7,7 @@ const https = require('https');
 const http = require('http');
 const { Client } = require('pg');
 
-const DB_URL = 'postgresql://postgres:CREDENCIAL-ELIMINADA@autorack.proxy.rlwy.net:49895/railway';
+const DB_URL = process.env.DATABASE_URL || (() => { throw new Error('Falta la variable de entorno DATABASE_URL'); })();
 
 function fetch(url) {
   return new Promise((resolve, reject) => {
@@ -30,7 +30,7 @@ function normalizeBarrio(name) {
 }
 
 async function main() {
-  const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
+  const client = new Client({ connectionString: DB_URL, ssl: (process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false) });
   await client.connect();
   console.log('✓ Conectado a Railway PostgreSQL');
 

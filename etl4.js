@@ -1,8 +1,8 @@
-const https = require('https');
+﻿const https = require('https');
 const { Client } = require('pg');
 
 const BASE = 'https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets';
-const DB_URL = 'postgresql://postgres:CREDENCIAL-ELIMINADA@autorack.proxy.rlwy.net:49895/railway';
+const DB_URL = process.env.DATABASE_URL || (() => { throw new Error('Falta la variable de entorno DATABASE_URL'); })();
 
 // ── Diccionario de aliases: nombre normalizado en dataset → nombre normalizado en GeoJSON ──
 // Resuelve los 8 barrios IBI que no matcheaban + 1 de vulnerabilidad
@@ -59,7 +59,7 @@ function rowObj(headers, line) {
 }
 
 async function main() {
-  const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
+  const client = new Client({ connectionString: DB_URL, ssl: (process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false) });
   await client.connect();
   console.log('Conectado a Railway');
 

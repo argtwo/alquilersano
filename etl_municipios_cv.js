@@ -1,4 +1,4 @@
-/**
+﻿/**
  * etl_municipios_cv.js
  * 
  * Carga TODOS los municipios de la Comunidad Valenciana en PostgreSQL:
@@ -14,7 +14,7 @@ const path = require('path');
 const { Client } = require('pg');
 
 const DIR = path.join(__dirname, 'data', 'raw', 'nacional');
-const DB_URL = 'postgresql://postgres:CREDENCIAL-ELIMINADA@autorack.proxy.rlwy.net:49895/railway';
+const DB_URL = process.env.DATABASE_URL || (() => { throw new Error('Falta la variable de entorno DATABASE_URL'); })();
 
 // ── Config por provincia ──
 const PROVINCIAS = {
@@ -97,7 +97,7 @@ function percentileRank(value, allValues) {
 }
 
 async function main() {
-  const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
+  const client = new Client({ connectionString: DB_URL, ssl: (process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false) });
   await client.connect();
   console.log('Conectado a Railway PostgreSQL\n');
 
