@@ -1,7 +1,11 @@
-﻿const https = require('https');
+const https = require('https');
 const { Client } = require('pg');
 
-const BASE = 'https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets';
+// El portal migro de Opendatasoft a CKAN en 2023: valencia.opendatasoft.com ya no existe.
+// URLs de https://opendata.vlci.valencia.es/api/3/action/package_show?id=<dataset>
+const URL_BARRIOS = 'https://geoportal.valencia.es/server/rest/services/OPENDATA/UrbanismoEInfraestructuras/MapServer/224/query?where=1=1&outFields=*&f=geojson';
+const URL_IBI = 'https://opendata.vlci.valencia.es/dataset/1c661538-ddc3-4558-82b4-eac59c14cd05/resource/3ffd0260-5da4-4368-9ac6-053ddbc3af6b/download/recibos-ibi-2020-2025.csv';
+const URL_VULNERABILIDAD = 'https://opendata.vlci.valencia.es/dataset/ca18278b-d040-4274-b9c7-c1a9daae54b9/resource/6648d1d5-4d35-410d-8260-432069045334/download/vulnerabilidad-por-barrios.csv';
 const DB_URL = process.env.DATABASE_URL || (() => { throw new Error('Falta la variable de entorno DATABASE_URL'); })();
 
 // ── Diccionario de aliases: nombre normalizado en dataset → nombre normalizado en GeoJSON ──
@@ -61,13 +65,13 @@ function rowObj(headers, line) {
 async function main() {
   const client = new Client({ connectionString: DB_URL, ssl: (process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false) });
   await client.connect();
-  console.log('Conectado a Railway');
+  console.log('Conectado a la base de datos');
 
   // ═══════════════════════════════════════════════════════════════════
   // 1. BARRIOS GeoJSON
   // ═══════════════════════════════════════════════════════════════════
   console.log('\n── 1. Descargando barrios GeoJSON ──');
-  const gjRaw = await fetchUrl(BASE + '/barris-barrios/exports/geojson?lang=es');
+  const gjRaw = await fetchUrl(URL_BARRIOS);
   const gj = JSON.parse(gjRaw);
 
   const barrioMap = {}; // norm(nombre) → db id
@@ -95,7 +99,7 @@ async function main() {
   // 2. IBI — con resolución de aliases
   // ═══════════════════════════════════════════════════════════════════
   console.log('\n── 2. Descargando IBI ──');
-  const ibiRaw = await fetchUrl(BASE + '/recibos-ibi-2020-2025/exports/csv?lang=es&delimiter=%3B');
+  const ibiRaw = await fetchUrl(URL_IBI);
   const { headers: ih, lines: il } = parseCSV(ibiRaw);
 
   const ibiMap = {};
@@ -134,7 +138,7 @@ async function main() {
   // ═══════════════════════════════════════════════════════════════════
   console.log('\n── 3. Descargando vulnerabilidad ──');
   try {
-    const vulRaw = await fetchUrl(BASE + '/vulnerabilidad-por-barrios/exports/csv?lang=es&delimiter=%3B');
+    const vulRaw = await fetchUrl(URL_VULNERABILIDAD);
     const { headers: vh, lines: vl } = parseCSV(vulRaw);
     console.log('Vuln headers:', vh.join(', '));
 
