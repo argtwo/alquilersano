@@ -20,20 +20,26 @@ Dark command center con:
 
 | Servicio | URL |
 |----------|-----|
-| **Frontend** | https://frontend-gamma-khaki-78.vercel.app |
-| **Backend API** | https://alquilersano-backend-production.up.railway.app |
+| **Demo en vivo** | https://omniwatch.tail83ece3.ts.net |
+| **Autor** | [Fabrizio Bertolo en LinkedIn](https://www.linkedin.com/in/fabriziobertolo/) |
 | **GitHub** | https://github.com/argtwo/alquilersano |
 
 ## Datos cargados
 
 | Ámbito | Fuente | Registros | IER |
 |--------|--------|-----------|-----|
-| **CV municipios** | ADRH/INE (renta + pobreza + Gini) | 534 municipios × 9 años | 0.2–94.3 |
-| **Valencia barrios** | Open Data Valencia (IBI + vulnerabilidad) | 87 barrios × 5 años | 3.0–82.8 |
+| **CV municipios** | ADRH/INE (renta + pobreza + Gini) | 542 municipios × 9 años | 0.2–94.3 |
+| **Valencia barrios** | Open Data Valencia vía CKAN (IBI + vulnerabilidad) | 88 barrios | 0.0–94.3 |
 | Madrid / Barcelona | Pendiente | — | ⏳ |
 
 ### Distribución IER municipios CV (2023)
 BAJO 67 · MEDIO 291 · ALTO 169 · CRÍTICO 7
+
+> **Nota sobre las fuentes.** El portal de datos abiertos de València migró de
+> Opendatasoft a CKAN, y el dominio antiguo dejó de existir. Los conectores están
+> actualizados a la API de CKAN (`/api/3/action/package_show`). Los CSV del INE se
+> guardan en `data/raw/`, así que la capa de municipios sobrevive a caídas del
+> proveedor: cachear la extracción es deliberado, no accidental.
 
 ## Stack
 
@@ -41,9 +47,9 @@ BAJO 67 · MEDIO 291 · ALTO 169 · CRÍTICO 7
 |------|-------------|
 | Frontend | React 18 + TypeScript + Vite, Leaflet (CartoDB dark tiles), DM Sans |
 | Backend | FastAPI + Python 3.12, SQLAlchemy async, Alembic |
-| DB | PostgreSQL 16 (Railway) — sin PostGIS |
+| DB | PostgreSQL 16 + PostGIS (autoalojado en Docker) |
 | ETL | Node.js (descarga INE + carga DB) |
-| Despliegue | Vercel (frontend) · Railway (backend + PostgreSQL) |
+| Despliegue | Docker Compose en servidor propio, expuesto con Tailscale Funnel |
 
 ## Fórmula IER
 
