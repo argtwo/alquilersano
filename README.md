@@ -101,10 +101,10 @@ MIT
 
 **Fabrizio Bertolo**
 
-[LinkedIn](https://www.linkedin.com/in/fabriziobertolo/) Â· [GitHub](https://github.com/argtwo)
+[LinkedIn](https://www.linkedin.com/in/fabriziobertolo/) · [GitHub](https://github.com/argtwo)
 
-Tecnico de soporte IT. Construyo herramientas propias para automatizar trabajo real:
-pipelines de datos, integracion de LLMs y aplicaciones que funcionan sin depender de
+Técnico de soporte IT. Construyo herramientas propias para automatizar trabajo real:
+pipelines de datos, integración de LLMs y aplicaciones que funcionan sin depender de
 servicios de terceros.
 
-Si reutilizas este proyecto o tienes dudas sobre como esta montado, escribeme.
+Si reutilizas este proyecto o tienes dudas sobre cómo está montado, escríbeme.
