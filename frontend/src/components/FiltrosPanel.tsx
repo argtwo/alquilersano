@@ -27,13 +27,15 @@ const CIUDADES: { value: Ciudad; label: string; disabled?: boolean }[] = [
   { value: 'barcelona',          label: 'Barcelona (Próximamente)', disabled: true },
 ]
 
+// Debe coincidir con DEFAULT_FILTROS de App.tsx: se usa para saber si el
+// usuario ha tocado algo y pintar el boton de limpiar filtros.
 const DEFAULT_FILTROS: FiltrosMapaState = {
-  anyo: 2025,
+  anyo: 2023,
   minIER: 0,
   maxIER: 100,
   riesgoDesahucio: 'TODOS',
   distrito: null,
-  ciudad: 'valencia',
+  ciudad: 'valencia_provincia',
 }
 
 export default function FiltrosPanel({ filtros, onChange, distritos }: Props) {

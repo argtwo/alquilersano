@@ -15,12 +15,16 @@ import type { BarrioConIER, FiltrosMapaState } from './types'
 type Vista = 'mapa' | 'ranking'
 
 const DEFAULT_FILTROS: FiltrosMapaState = {
-  anyo: 2025,
+  // Arranca en municipios: es la capa con datos completos (542 municipios,
+  // 2015-2023). La de barrios de Valencia depende del portal del Ayuntamiento
+  // y puede quedarse vacia, y un mapa en blanco al entrar es mala primera
+  // impresion.
+  anyo: 2023,
   minIER: 0,
   maxIER: 100,
   riesgoDesahucio: 'TODOS',
   distrito: null,
-  ciudad: 'valencia',
+  ciudad: 'valencia_provincia',
 }
 
 export default function App() {
