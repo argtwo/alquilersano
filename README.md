@@ -94,3 +94,17 @@ echo "VITE_API_URL=http://localhost:8000" > .env && npm run dev
 
 ## Licencia
 MIT
+
+---
+
+## Autor
+
+**Fabrizio Bertolo**
+
+[LinkedIn](https://www.linkedin.com/in/fabriziobertolo/) Â· [GitHub](https://github.com/argtwo)
+
+Tecnico de soporte IT. Construyo herramientas propias para automatizar trabajo real:
+pipelines de datos, integracion de LLMs y aplicaciones que funcionan sin depender de
+servicios de terceros.
+
+Si reutilizas este proyecto o tienes dudas sobre como esta montado, escribeme.
