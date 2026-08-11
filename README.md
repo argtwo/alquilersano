@@ -20,7 +20,7 @@ Dark command center con:
 
 | Servicio | URL |
 |----------|-----|
-| **Demo en vivo** | https://omniwatch.tail83ece3.ts.net |
+| **Demo en vivo** | https://fserver.tail83ece3.ts.net |
 | **Autor** | [Fabrizio Bertolo en LinkedIn](https://www.linkedin.com/in/fabriziobertolo/) |
 | **GitHub** | https://github.com/argtwo/alquilersano |
 
